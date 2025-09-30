@@ -20,7 +20,7 @@ function Homepage() {
         </div>
       </header>
 
-      <section className="quick-stats" aria-label="Impact stats">
+      <section className="quick-stats" aria-label="Impact stats" id="impact">
         <div className="stat">
           <i className="fi fi-sr-box"></i>
           <div>
@@ -51,7 +51,7 @@ function Homepage() {
         </div>
       </section>
 
-      <section className="features" aria-label="Platform features">
+      <section className="features" aria-label="Platform features" id="features">
         <article className="card">
           <i className="fi fi-rr-hand-holding-heart icon"></i>
           <h3>Track Donations</h3>
@@ -84,7 +84,7 @@ function Homepage() {
         </div>
       </section>
 
-      <footer className="site-footer">
+      <footer className="site-footer" id="volunteer">
         <p>© {new Date().getFullYear()} Convoy of Hope • All rights reserved.</p>
       </footer>
     </div>

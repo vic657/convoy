@@ -41,6 +41,10 @@ body {
   min-width: 320px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
