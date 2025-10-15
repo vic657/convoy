@@ -1,10 +1,15 @@
 import React from 'react'
+import Navbar from '../Components/Navbar';
+import DOMPurify from 'dompurify';
+
 
 function Homepage() {
   return (
     <div className="home">
+      < Navbar/>
+      {/* HERO SECTION */}
       <header className="hero">
-        <div className="hero-content">
+        <div className="hero-content container">
           <h1>Convoy of Hope</h1>
           <p>Connecting donors, staff, and beneficiaries to deliver hope efficiently.</p>
           <div className="hero-actions">
@@ -20,7 +25,8 @@ function Homepage() {
         </div>
       </header>
 
-      <section className="quick-stats" aria-label="Impact stats">
+      {/* QUICK STATS */}
+      <section className="quick-stats container" aria-label="Impact stats">
         <div className="stat">
           <i className="fi fi-sr-box"></i>
           <div>
@@ -51,7 +57,8 @@ function Homepage() {
         </div>
       </section>
 
-      <section className="features" aria-label="Platform features">
+      {/* FEATURES */}
+      <section className="features container" aria-label="Platform features">
         <article className="card">
           <i className="fi fi-rr-hand-holding-heart icon"></i>
           <h3>Track Donations</h3>
@@ -74,8 +81,9 @@ function Homepage() {
         </article>
       </section>
 
+      {/* CALL TO ACTION */}
       <section className="cta-band" id="donate">
-        <div className="cta-content">
+        <div className="cta-content container">
           <h2>Your generosity fuels the mission</h2>
           <a className="btn btn-primary" href="#">
             <i className="fi fi-rr-hand-holding-usd"></i>
@@ -84,7 +92,8 @@ function Homepage() {
         </div>
       </section>
 
-      <footer className="site-footer">
+      {/* FOOTER */}
+      <footer className="site-footer container">
         <p>© {new Date().getFullYear()} Convoy of Hope • All rights reserved.</p>
       </footer>
     </div>
@@ -92,5 +101,3 @@ function Homepage() {
 }
 
 export default Homepage
-
-
