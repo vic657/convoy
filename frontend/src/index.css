@@ -266,3 +266,113 @@ h1 {
   }
 }
 
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: var(--color-white);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+/* Form Inputs */
+.modal-content input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.modal-content button[type="submit"] {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.modal-content button[type="submit"]:hover {
+  background-color: var(--color-primary-deep);
+}
+
+/* Close Button */
+.close-btn {
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.close-btn:hover {
+  color: var(--color-danger);
+}
+
+/* Error Alert */
+.alert-danger {
+  background-color: #fef2f2;
+  color: var(--color-danger);
+  border: 1px solid #fee2e2;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile Tweaks */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.25rem;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .modal-content input {
+    font-size: 0.95rem;
+  }
+
+  .modal-content button[type="submit"] {
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+  }
+}
+select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #1f2937;
+  font-size: 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20'%3E%3Cpath d='M5.25 7.5L10 12.25L14.75 7.5H5.25Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
