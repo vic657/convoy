@@ -13,5 +13,8 @@ Route::get('/test', function () {
 Route::prefix('v1/auth')->group(function () {
     Route::post('/register', [AuthController::class, 'registerDirect']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    Route::post('/verify-otp-register', [AuthController::class, 'registerWithOtp']);
+
 });
 
