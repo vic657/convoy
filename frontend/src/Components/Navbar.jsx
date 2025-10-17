@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import CountryList from 'country-list-with-dial-code-and-flag';
+import axios from '../axios'; // adjust path if needed
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const countries = CountryList.getAll().sort((a, b) => a.name.localeCompare(b.name));
 
-const Navbar = () => {
+const Navbar = ({ navigate }) => {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -19,6 +21,8 @@ const Navbar = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -57,7 +61,6 @@ const Navbar = () => {
     return newErrors.length === 0;
   };
 
-  // Step 1: Send OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -83,7 +86,6 @@ const Navbar = () => {
     }
   };
 
-  // Step 2: Verify OTP and register
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
@@ -120,9 +122,33 @@ const Navbar = () => {
     }
   };
 
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoginError('');
+
+  try {
+    const res = await axios.post('/login', loginData);
+    const { token, user } = res.data;
+
+    localStorage.setItem('auth_token', token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    alert(`Welcome back, ${user.name}`);
+    setShowLogin(false);
+    setLoginData({ email: '', password: '' });
+
+    // ✅ Redirect to dashboard
+    navigate('/userdashboard');
+  } catch (err) {
+    console.error(err);
+    setLoginError(err.response?.data?.error || 'Login failed');
+  }
+};
+
+
   return (
     <header>
-      {/* top contact strip */}
+      {/* contact strip */}
       <div className="contact-strip">
         <div className="contact-left">
           <span><FaPhoneAlt /> +254 705 798 382</span>
@@ -163,16 +189,13 @@ const Navbar = () => {
               <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
               <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
               <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-
               <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
                 <option value="">Select Nationality</option>
                 {countries.map((country) => (
                   <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
                 ))}
               </select>
-
               <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
-
               <div style={{ position: 'relative' }}>
                 <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password"
                   value={formData.password} onChange={handleChange} />
@@ -180,7 +203,6 @@ const Navbar = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
               <div style={{ position: 'relative' }}>
                 <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password"
                   value={formData.confirmPassword} onChange={handleChange} />
@@ -188,13 +210,39 @@ const Navbar = () => {
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
               <button type="submit">Send OTP</button>
             </form>
+            
             <button className="close-btn" onClick={() => setShowRegister(false)}>Close</button>
           </div>
         </div>
       )}
+{showLogin && (
+  <div className="modal-overlay">
+    <div className="modal-content" ref={loginRef}>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+        {loginError && <div className="alert-danger">{loginError}</div>}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={loginData.email}
+          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={loginData.password}
+          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+        />
+        <button type="submit">Login</button>
+      </form>
+      <button className="close-btn" onClick={() => setShowLogin(false)}>Close</button>
+    </div>
+  </div>
+)}
 
       {/* OTP Verification Modal */}
       {showOtpModal && (

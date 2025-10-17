@@ -376,3 +376,161 @@ select {
   background-position: right 0.75rem center;
   background-size: 1rem;
 }
+/* === DASHBOARD STYLES === */
+.dashboard-wrapper {
+  background-color: var(--color-gray-100);
+  min-height: 100vh;
+  padding: 2rem 1.25rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-white);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary-deep);
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-danger);
+  color: var(--color-white);
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+/* Profile Card */
+.profile-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.profile-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--color-text-dark);
+}
+
+.profile-card .profile-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+  color: #4b5563;
+}
+
+/* Table (Payment History) */
+.table-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.table-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-primary-deep);
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.dashboard-table th, .dashboard-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+}
+.dashboard-table th {
+  background: var(--color-gray-100);
+  font-weight: 600;
+  text-align: left;
+}
+.dashboard-table tr:hover {
+  background-color: #f9fafb;
+}
+.dashboard-table td.status-confirmed {
+  color: var(--color-success);
+  font-weight: 600;
+}
+.dashboard-table td.status-pending {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/* Notifications */
+.notifications {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.notifications h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-primary-deep);
+}
+
+.notifications ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.notifications li {
+  background: #fff7ed;
+  border-left: 4px solid var(--color-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #78350f;
+}
+.notifications li:hover {
+  background: #ffedd5;
+}
+
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+}
