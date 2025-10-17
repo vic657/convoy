@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
@@ -12,26 +12,18 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [countryCode, setCountryCode] = useState('');
   const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    nationality: '',
-    phone: '',
-    passportId: '',
-    password: '',
-    confirmPassword: '',
+    name: '', email: '', nationality: '', phone: '',
+    passportId: '', password: '', confirmPassword: '',
   });
 
   const registerRef = useRef();
-  const loginRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,11 +49,9 @@ const Navbar = () => {
     return newErrors.length === 0;
   };
 
-  // Step 1: Send OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     try {
       const res = await fetch(`${API_BASE}/v1/auth/send-otp`, {
         method: 'POST',
@@ -71,9 +61,8 @@ const Navbar = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setOtpSent(true);
-        setShowOtpModal(true);
         alert('OTP sent to your email. It will expire in 5 minutes.');
+        setShowOtpModal(true);
       } else {
         alert(data.error || 'Failed to send OTP.');
       }
@@ -83,7 +72,6 @@ const Navbar = () => {
     }
   };
 
-  // Step 2: Verify OTP and register
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
@@ -107,10 +95,6 @@ const Navbar = () => {
         setShowOtpModal(false);
         setShowRegister(false);
         setOtp('');
-        setFormData({
-          name: '', email: '', nationality: '', phone: '',
-          passportId: '', password: '', confirmPassword: ''
-        });
       } else {
         alert(data.error || 'Invalid OTP.');
       }
@@ -122,7 +106,7 @@ const Navbar = () => {
 
   return (
     <header>
-      {/* top contact strip */}
+      {/* Top contact strip */}
       <div className="contact-strip">
         <div className="contact-left">
           <span><FaPhoneAlt /> +254 705 798 382</span>
@@ -133,23 +117,100 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* navbar */}
+      {/* Navbar main section */}
       <nav className="main-nav">
-        <div className="logo">
-          <h1>convoy of hope</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
+        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          
+          {/* Logo Section */}
+          <div className="logo" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <h1 style={{ margin: 0, color: '#EA580C', fontWeight: '800' }}>Convoy of Hope</h1>
+            <p style={{ fontSize: '0.85rem', color: '#555', margin: 0 }}>
+              Delivering food, supplies, and hope to communities in need.
+            </p>
+          </div>
+
+          {/* Hamburger menu */}
+          <button
+            className="menu-toggle"
+            aria-label="Toggle navigation"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+
+          {/* Nav Links */}
+          <ul className={`nav-links ${menuOpen ? 'open' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#impact">Impact</a></li>
+            <li><a href="#programs">Programs</a></li>
+            <li><a href="#volunteer">Volunteer</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+
+            {/* Buttons neatly aligned with hover effects */}
+            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {/* Donate Button */}
+              <a
+                href="#donate"
+                className="btn-donate"
+                style={{
+                  background: '#EA580C',
+                  color: 'white',
+                  padding: '0.5rem 1.2rem',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#f97316'; // lighter orange
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#EA580C';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                Donate
+              </a>
+
+              {/* Register Button */}
+              <button
+                className="btn-register"
+                onClick={() => setShowRegister(true)}
+                style={{
+                  background: 'transparent',
+                  color: '#EA580C',
+                  border: '2px solid #EA580C',
+                  padding: '0.45rem 1.1rem',
+                  borderRadius: '6px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#EA580C';
+                  e.target.style.color = 'white';
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'transparent';
+                  e.target.style.color = '#EA580C';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                Register
+              </button>
+            </li>
+          </ul>
         </div>
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
-        <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">About us</a></li>
-          <li><button onClick={() => setShowRegister(true)}>Register</button></li>
-          <li><button onClick={() => setShowLogin(true)}>Login</button></li>
-        </ul>
       </nav>
 
-      {/* Registration Modal */}
+      {/* Register Modal */}
       {showRegister && (
         <div className="modal-overlay">
           <div className="modal-content" ref={registerRef}>
@@ -174,29 +235,29 @@ const Navbar = () => {
               <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
 
               <div style={{ position: 'relative' }}>
-                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password"
-                  value={formData.password} onChange={handleChange} />
+                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
                 <span onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
 
               <div style={{ position: 'relative' }}>
-                <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password"
-                  value={formData.confirmPassword} onChange={handleChange} />
+                <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
                 <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
 
-              <button type="submit">Send OTP</button>
+              <button type="submit" style={{ background: '#EA580C', color: 'white', padding: '0.6rem', borderRadius: '6px', width: '100%', fontWeight: '600' }}>
+                Send OTP
+              </button>
             </form>
             <button className="close-btn" onClick={() => setShowRegister(false)}>Close</button>
           </div>
         </div>
       )}
 
-      {/* OTP Verification Modal */}
+      {/* OTP Modal */}
       {showOtpModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -204,7 +265,9 @@ const Navbar = () => {
             <p>Enter the 6-digit code sent to your email.</p>
             <form onSubmit={handleVerifyOtp}>
               <input type="text" maxLength="6" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />
-              <button type="submit">Verify & Register</button>
+              <button type="submit" style={{ background: '#EA580C', color: 'white', padding: '0.6rem', borderRadius: '6px', width: '100%', fontWeight: '600' }}>
+                Verify & Register
+              </button>
             </form>
             <button onClick={() => setShowOtpModal(false)}>Cancel</button>
           </div>
