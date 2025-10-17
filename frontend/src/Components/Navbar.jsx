@@ -4,7 +4,8 @@ import {
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import CountryList from 'country-list-with-dial-code-and-flag';
-import axios from '../axios'; // adjust path if needed
+import axios from '../axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const countries = CountryList.getAll().sort((a, b) => a.name.localeCompare(b.name));
@@ -23,6 +24,7 @@ const Navbar = ({ navigate }) => {
   const [errors, setErrors] = useState([]);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -126,8 +128,18 @@ const Navbar = ({ navigate }) => {
   e.preventDefault();
   setLoginError('');
 
+  if (!recaptchaToken) {
+    setLoginError('Please complete the CAPTCHA.');
+    return;
+  }
+
   try {
-    const res = await axios.post('/login', loginData);
+    const res = await axios.post('/login', {
+      email: loginData.email,
+      password: loginData.password,
+      recaptcha_token: recaptchaToken, 
+    });
+
     const { token, user } = res.data;
 
     localStorage.setItem('auth_token', token);
@@ -136,8 +148,7 @@ const Navbar = ({ navigate }) => {
     alert(`Welcome back, ${user.name}`);
     setShowLogin(false);
     setLoginData({ email: '', password: '' });
-
-    // ✅ Redirect to dashboard
+    setRecaptchaToken(''); // optional: reset token
     navigate('/userdashboard');
   } catch (err) {
     console.error(err);
@@ -222,23 +233,30 @@ const Navbar = ({ navigate }) => {
     <div className="modal-content" ref={loginRef}>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        {loginError && <div className="alert-danger">{loginError}</div>}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={loginData.email}
-          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={loginData.password}
-          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-        />
-        <button type="submit">Login</button>
-      </form>
+      {loginError && <div className="alert-danger">{loginError}</div>}
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={loginData.email}
+        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={loginData.password}
+        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+      />
+
+      <ReCAPTCHA
+        sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb"
+
+        onChange={(token) => setRecaptchaToken(token)}
+      />
+
+      <button type="submit">Login</button>
+    </form>
       <button className="close-btn" onClick={() => setShowLogin(false)}>Close</button>
     </div>
   </div>
