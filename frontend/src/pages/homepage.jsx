@@ -1,12 +1,14 @@
 import React from 'react'
 import Navbar from '../Components/Navbar';
 import DOMPurify from 'dompurify';
+import { useNavigate } from 'react-router-dom';
 
 
 function Homepage() {
+  const navigate = useNavigate();
   return (
     <div className="home">
-      < Navbar/>
+      <Navbar navigate={navigate} />
       {/* HERO SECTION */}
       <header className="hero">
         <div className="hero-content container">

@@ -4,11 +4,14 @@ import {
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import CountryList from 'country-list-with-dial-code-and-flag';
+import axios from '../axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const countries = CountryList.getAll().sort((a, b) => a.name.localeCompare(b.name));
 
-const Navbar = () => {
+const Navbar = ({ navigate }) => {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -17,6 +20,9 @@ const Navbar = () => {
   const [countryCode, setCountryCode] = useState('');
   const [otp, setOtp] = useState('');
   const [errors, setErrors] = useState([]);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
 
   const [formData, setFormData] = useState({
     name: '', email: '', nationality: '', phone: '',
@@ -104,9 +110,43 @@ const Navbar = () => {
     }
   };
 
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoginError('');
+
+  if (!recaptchaToken) {
+    setLoginError('Please complete the CAPTCHA.');
+    return;
+  }
+
+  try {
+    const res = await axios.post('/login', {
+      email: loginData.email,
+      password: loginData.password,
+      recaptcha_token: recaptchaToken, 
+    });
+
+    const { token, user } = res.data;
+
+    localStorage.setItem('auth_token', token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    alert(`Welcome back, ${user.name}`);
+    setShowLogin(false);
+    setLoginData({ email: '', password: '' });
+    setRecaptchaToken(''); // optional: reset token
+    navigate('/userdashboard');
+  } catch (err) {
+    console.error(err);
+    setLoginError(err.response?.data?.error || 'Login failed');
+  }
+};
+
+
   return (
     <header>
       {/* Top contact strip */}
+      {/* contact strip */}
       <div className="contact-strip">
         <div className="contact-left">
           <span><FaPhoneAlt /> +254 705 798 382</span>
@@ -224,23 +264,19 @@ const Navbar = () => {
               <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
               <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
               <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-
               <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
                 <option value="">Select Nationality</option>
                 {countries.map((country) => (
                   <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
                 ))}
               </select>
-
               <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
-
               <div style={{ position: 'relative' }}>
                 <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
                 <span onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
               <div style={{ position: 'relative' }}>
                 <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
                 <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
@@ -251,11 +287,46 @@ const Navbar = () => {
               <button type="submit" style={{ background: '#EA580C', color: 'white', padding: '0.6rem', borderRadius: '6px', width: '100%', fontWeight: '600' }}>
                 Send OTP
               </button>
+              <button type="submit">Send OTP</button>
             </form>
+            
             <button className="close-btn" onClick={() => setShowRegister(false)}>Close</button>
           </div>
         </div>
       )}
+{showLogin && (
+  <div className="modal-overlay">
+    <div className="modal-content" ref={loginRef}>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+      {loginError && <div className="alert-danger">{loginError}</div>}
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={loginData.email}
+        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={loginData.password}
+        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+      />
+
+      <ReCAPTCHA
+        sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb"
+
+        onChange={(token) => setRecaptchaToken(token)}
+      />
+
+      <button type="submit">Login</button>
+    </form>
+      <button className="close-btn" onClick={() => setShowLogin(false)}>Close</button>
+    </div>
+  </div>
+)}
 
       {/* OTP Modal */}
       {showOtpModal && (

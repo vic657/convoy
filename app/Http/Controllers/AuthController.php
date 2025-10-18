@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\Otp;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+
 
 class AuthController extends Controller
 {
@@ -90,21 +92,38 @@ class AuthController extends Controller
      * Basic login
      */
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+        'recaptcha_token' => 'required|string',
+    ]);
 
-        $user = User::where('email', $request->email)->first();
+    // ✅ Verify reCAPTCHA
+    $recaptcha = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
+        'response' => $request->recaptcha_token,
+    ]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
-        }
-
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => $user,
-        ]);
+    if (!$recaptcha->json('success')) {
+        return response()->json(['error' => 'reCAPTCHA failed'], 422);
     }
+
+    // ✅ Check credentials
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['error' => 'Invalid credentials'], 401);
+    }
+
+    // ✅ Issue token (if using Sanctum or Passport)
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'message' => 'Login successful',
+        'user' => $user,
+        'token' => $token,
+    ]);
+}
+
 }

@@ -10,11 +10,12 @@ Route::get('/test', function () {
 });
 
 // Grouped under /api/v1/auth
-Route::prefix('v1/auth')->group(function () {
+Route::prefix('v1/auth')->middleware(['api'])->group(function () {
     Route::post('/register', [AuthController::class, 'registerDirect']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp-register', [AuthController::class, 'registerWithOtp']);
-
 });
+
+
 
