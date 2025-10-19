@@ -197,12 +197,13 @@ h1 {
 }
 .logo p {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #c1c5cc;
   margin: 0;
 }
 .nav-links {
   display: flex;
   gap: 1.5rem;
+  align-items: center;
   list-style: none;
 }
 .nav-links a {
@@ -212,6 +213,15 @@ h1 {
 }
 .nav-links a:hover {
   color: var(--color-primary);
+}
+.button{
+  background: #EA580C;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 @media (max-width: 768px) {
   .contact-strip {
@@ -533,4 +543,75 @@ select {
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
+}
+.close-circle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #EA580C;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.close-circle:hover {
+  background: #f97316;
+  transform: rotate(90deg);
+}
+
+.modal-title {
+  text-align: center;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.primary-btn {
+  background: #EA580C;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.primary-btn:hover {
+  background: #f97316;
+  transform: translateY(-2px);
+}
+
+.switch-text {
+  text-align: center;
+  margin-top: 1rem;
+  color: #555;
+}
+.switch-link {
+  color: #EA580C;
+  font-weight: 600;
+  cursor: pointer;
+}
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  color: #666;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }

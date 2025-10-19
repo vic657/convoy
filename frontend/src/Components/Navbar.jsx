@@ -173,91 +173,201 @@ const Navbar = ({ navigate }) => {
       {/* navbar */}
       <nav className="main-nav">
         <div className="logo">
-          <h1>convoy of hope</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
+          <h1 style={{ margin: 0, color: '#EA580C', fontWeight: '800' }}>convoy of hope</h1>
+          <p>Delivering food, supplies, and hope to communities in need.</p>
         </div>
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
-        <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">About us</a></li>
-          <li><button onClick={() => setShowRegister(true)}>Register</button></li>
-          <li><button onClick={() => setShowLogin(true)}>Login</button></li>
+        <ul className={`nav-links ${menuOpen ? 'open' : ''}`} >
+          <li><a href="#home">Home</a></li>
+            <li><a href="#impact">Impact</a></li>
+            <li><a href="#programs">Programs</a></li>
+            <li><a href="#volunteer">Volunteer</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+          <li style={{ listStyle: 'none' }}>
+    <button
+      onClick={() => setShowLogin(true)}
+      style={{
+        background: '#EA580C',
+        color: 'white',
+        padding: '0.5rem 1.2rem',
+        borderRadius: '6px',
+        border: 'none',
+        textDecoration: 'none',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.background = '#f97316'; // lighter orange
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.4)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.background = '#EA580C';
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = 'none';
+      }}
+    >
+      Donate
+    </button>
+  </li>
+
+  {/* Register Button */}
+  <li style={{ listStyle: 'none' }}>
+    <button
+      onClick={() => setShowRegister(true)}
+      style={{
+        background: 'transparent',
+        color: '#EA580C',
+        border: '2px solid #EA580C',
+        padding: '0.45rem 1.1rem',
+        borderRadius: '6px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.background = '#EA580C';
+        e.target.style.color = 'white';
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.background = 'transparent';
+        e.target.style.color = '#EA580C';
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = 'none';
+      }}
+    >
+      Register
+    </button>
+  </li>
         </ul>
       </nav>
 
-      {/* Registration Modal */}
-      {showRegister && (
-        <div className="modal-overlay">
-          <div className="modal-content" ref={registerRef}>
-            <h2>Register</h2>
-            <form onSubmit={handleSendOtp}>
-              {errors.length > 0 && (
-                <div className="alert-danger">
-                  <ul>{errors.map((err, i) => <li key={i}>{err}</li>)}</ul>
-                </div>
-              )}
-              <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
-              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-              <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-              <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
-                <option value="">Select Nationality</option>
-                {countries.map((country) => (
-                  <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
-                ))}
-              </select>
-              <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
-              <div style={{ position: 'relative' }}>
-                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password"
-                  value={formData.password} onChange={handleChange} />
-                <span onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password"
-                  value={formData.confirmPassword} onChange={handleChange} />
-                <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}>
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-              <button type="submit">Send OTP</button>
-            </form>
-            
-            <button className="close-btn" onClick={() => setShowRegister(false)}>Close</button>
+{/* Registration Modal */}
+{showRegister && (
+  <div
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target.classList.contains("modal-overlay")) setShowRegister(false);
+    }}
+    onKeyDown={(e) => e.key === "Escape" && setShowRegister(false)}
+    tabIndex={0}
+  >
+    <div className="modal-content" ref={registerRef}>
+      {/* Orange Round Close Button */}
+      <button
+        onClick={() => setShowRegister(false)}
+        className="close-circle"
+      >
+        ✕
+      </button>
+
+      <h2 className="modal-title">Register</h2>
+      <form onSubmit={handleSendOtp}>
+        {errors.length > 0 && (
+          <div className="alert-danger">
+            <ul>{errors.map((err, i) => <li key={i}>{err}</li>)}</ul>
           </div>
+        )}
+        <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
+        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+        <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
+        <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
+          <option value="">Select Nationality</option>
+          {countries.map((country) => (
+            <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
+          ))}
+        </select>
+        <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
+        <div style={{ position: 'relative' }}>
+          <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password"
+            value={formData.password} onChange={handleChange} />
+          <span onClick={() => setShowPassword(!showPassword)} className="eye-icon">
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
         </div>
-      )}
+        <div style={{ position: 'relative' }}>
+          <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password"
+            value={formData.confirmPassword} onChange={handleChange} />
+          <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="eye-icon">
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+        <button type="submit" className="primary-btn">Send OTP</button>
+      </form>
+
+      {/* Switch to login */}
+      <p className="switch-text">
+        Already have an account?{" "}
+        <span
+          className="switch-link"
+          onClick={() => {
+            setShowRegister(false);
+            setShowLogin(true);
+          }}
+        >
+          Login
+        </span>
+      </p>
+    </div>
+  </div>
+)}
+
+{/* Login Modal */}
 {showLogin && (
-  <div className="modal-overlay">
+  <div
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target.classList.contains("modal-overlay")) setShowLogin(false);
+    }}
+    onKeyDown={(e) => e.key === "Escape" && setShowLogin(false)}
+    tabIndex={0}
+  >
     <div className="modal-content" ref={loginRef}>
-      <h2>Login</h2>
+      <button onClick={() => setShowLogin(false)} className="close-circle">✕</button>
+
+      <h2 className="modal-title">Login</h2>
       <form onSubmit={handleLogin}>
-      {loginError && <div className="alert-danger">{loginError}</div>}
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={loginData.email}
-        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={loginData.password}
-        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-      />
+        {loginError && <div className="alert-danger">{loginError}</div>}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={loginData.email}
+          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={loginData.password}
+          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+        />
 
-      <ReCAPTCHA
-        sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb"
+        <ReCAPTCHA
+          sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb"
+          onChange={(token) => setRecaptchaToken(token)}
+        />
 
-        onChange={(token) => setRecaptchaToken(token)}
-      />
+        <button type="submit" className="primary-btn">Login</button>
+      </form>
 
-      <button type="submit">Login</button>
-    </form>
-      <button className="close-btn" onClick={() => setShowLogin(false)}>Close</button>
+      {/* Switch to Register */}
+      <p className="switch-text">
+        Don’t have an account?{" "}
+        <span
+          className="switch-link"
+          onClick={() => {
+            setShowLogin(false);
+            setShowRegister(true);
+          }}
+        >
+          Register
+        </span>
+      </p>
     </div>
   </div>
 )}
