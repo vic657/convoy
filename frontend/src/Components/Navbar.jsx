@@ -30,6 +30,9 @@ const Navbar = ({ navigate }) => {
   });
 
   const registerRef = useRef();
+  // login modal refs/state (were missing and caused runtime ReferenceError)
+  const loginRef = useRef();
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -287,7 +290,6 @@ const Navbar = ({ navigate }) => {
               <button type="submit" style={{ background: '#EA580C', color: 'white', padding: '0.6rem', borderRadius: '6px', width: '100%', fontWeight: '600' }}>
                 Send OTP
               </button>
-              <button type="submit">Send OTP</button>
             </form>
             
             <button className="close-btn" onClick={() => setShowRegister(false)}>Close</button>
