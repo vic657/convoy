@@ -1,105 +1,211 @@
-import React from 'react'
-import Navbar from '../Components/Navbar';
-import DOMPurify from 'dompurify';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from "react";
+import AOS from "aos";
 
+import "../assets/css/bootstrap.min.css";
+import "../assets/css/all.min.css";
+import "../assets/css/animate.compat.css";
+import "../assets/css/styles.css";
 
-function Homepage() {
-  const navigate = useNavigate();
+// Import images
+import img1 from "../assets/images/img1.jpg";
+import ico1 from "../assets/images/ico1.png";
+import ico2 from "../assets/images/ico2.png";
+import ico3 from "../assets/images/ico3.png";
+import ico4 from "../assets/images/ico4.png";
+import card1 from "../assets/images/card1.jpg";
+import card2 from "../assets/images/card2.jpg";
+import card3 from "../assets/images/card3.jpg";
+import gallery1 from "../assets/images/gallery1.jpg";
+import gallery2 from "../assets/images/gallery2.jpg";
+import gallery3 from "../assets/images/gallery3.jpg";
+import gallery4 from "../assets/images/gallery4.jpg";
+import gallery5 from "../assets/images/gallery5.jpg";
+
+// Import Navbar
+import Navbar from "../Components/Navbar";
+
+const Homepage = () => {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+    });
+  }, []);
+
   return (
-    <div className="home">
-      <Navbar navigate={navigate} />
-      {/* HERO SECTION */}
-      <header className="hero">
-        <div className="hero-content container">
-          <h1>Convoy of Hope</h1>
-          <p>Connecting donors, staff, and beneficiaries to deliver hope efficiently.</p>
-          <div className="hero-actions">
-            <a className="btn btn-primary" href="#donate">
-              <i className="fi fi-rr-donate"></i>
-              Donate Now
-            </a>
-            <a className="btn btn-secondary" href="#volunteer">
-              <i className="fi fi-rr-users"></i>
-              Volunteer
-            </a>
-          </div>
-        </div>
-      </header>
+    <>
+      {/* Navbar */}
+      <Navbar />
 
-      {/* QUICK STATS */}
-      <section className="quick-stats container" aria-label="Impact stats">
-        <div className="stat">
-          <i className="fi fi-sr-box"></i>
-          <div>
-            <h3>12,450+</h3>
-            <p>Food Boxes Delivered</p>
+      {/* Hero Section */}
+      <section id="sec-0">
+        <article>
+          <div className="container">
+            <h1>We are Convoy of Hope</h1>
+            <h2>
+              Donation services <br />
+              <span>International Africa</span>
+            </h2>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore fuga debitis distinctio doloribus quis adipisci asperiores soluta quidem nemo aperiam maiores tempora, accusamus minus odit magni corporis molestias dignissimos porro?
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ratione assumenda recusandae earum totam fuga!
+            </p>
+            <a href="#">Show More</a>
+            <a href="#">Donate</a>
           </div>
+        </article>
+      </section>
+
+      {/* Section 1 - Welcome */}
+      <section id="sec-1">
+        <div className="container">
+          <article>
+            <h1>Welcome to our Organization</h1>
+            <h2>Lorem ipsum dolor sit amet.</h2>
+            <p>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate deserunt magni sint mollitia similique corporis quis voluptatibus, eos tempora alias illo nemo excepturi blanditiis vitae impedit minus tempore praesentium harum. <br /><br />
+              Quis, temporibus dolorum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit maxime minima quod eius aspernatur. Accusantium sed sunt corrupti sapiente deleniti?
+            </p>
+            <a href="#">Show More</a>
+          </article>
+          <aside>
+            <img src={img1} alt="man" />
+          </aside>
         </div>
-        <div className="stat">
-          <i className="fi fi-sr-donate"></i>
-          <div>
-            <h3>$820k</h3>
-            <p>Funds Raised</p>
-          </div>
+      </section>
+
+      {/* Section 2 - Why Choose Us */}
+      <section id="sec-2">
+        <div className="container">
+          <h1>Why choose us?</h1>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto ducimus, voluptatibus perferendis voluptates quidem magni illo odit velit? Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam, expedita tenetur? Pariatur itaque eveniet nam possimus omnis veniam cupiditate provident.
+          </p>
+
+          <article>
+            {[{ img: ico1, title: "Transparency" }, { img: ico2, title: "Donations" }, { img: ico3, title: "Community Growth" }, { img: ico4, title: "Development" }].map((item, i) => (
+              <figure key={i}>
+                <div><img src={item.img} alt={item.title} /></div>
+                <div className="cont">
+                  <h2>{item.title}</h2>
+                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. A iste ad illum, ducimus asperiores necessitatibus reprehenderit?</p>
+                </div>
+              </figure>
+            ))}
+          </article>
         </div>
-        <div className="stat">
-          <i className="fi fi-sr-users"></i>
-          <div>
-            <h3>2,300+</h3>
-            <p>Active Volunteers</p>
-          </div>
-        </div>
-        <div className="stat">
-          <i className="fi fi-sr-people-carry-box"></i>
-          <div>
-            <h3>35</h3>
-            <p>Communities Served</p>
+      </section>
+
+      {/* Section 3 - Our Services */}
+      <section id="sec-3">
+        <div className="container">
+          <h1>Our Services</h1>
+          <div className="cont">
+            {[{ img: card1, title: "Food Distributions" }, { img: card2, title: "Donations" }, { img: card3, title: "Community Development" }].map((card, i) => (
+              <div className="card border-0" key={i}>
+                <div>
+                  <img src={card.img} className="card-img-top" alt={card.title} />
+                  <h5 className="caption">{card.title}</h5>
+                </div>
+                <div className="card-body px-0 pt-4">
+                  <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum expedita tempora quam omnis deleniti! Consequuntur, distinctio magnam beatae dignissimos assumenda quisquam accusamus similique aut esse pariatur consectetur ab adipisci cupiditate sint maxime dolorum doloremque autem quasi nostrum nobis dicta?
+                  </p>
+                  <a href="#">Show More</a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="features container" aria-label="Platform features">
-        <article className="card">
-          <i className="fi fi-rr-hand-holding-heart icon"></i>
-          <h3>Track Donations</h3>
-          <p>Monitor food, funds, and non-food items with real-time transparency.</p>
-        </article>
-        <article className="card">
-          <i className="fi fi-rr-id-badge icon"></i>
-          <h3>Manage Volunteers</h3>
-          <p>Onboard, schedule, and coordinate staff and volunteers seamlessly.</p>
-        </article>
-        <article className="card">
-          <i className="fi fi-rr-truck-loading icon"></i>
-          <h3>Distribution Oversight</h3>
-          <p>Track deliveries to families and individuals to ensure fairness.</p>
-        </article>
-        <article className="card">
-          <i className="fi fi-rr-chart-histogram icon"></i>
-          <h3>Accountable Reports</h3>
-          <p>Generate exportable reports for audits, partners, and donors.</p>
-        </article>
-      </section>
+      {/* Section 4 - Milestone */}
+      <section id="sec-4">
+        <div className="container">
+          <h1>Our Milestone</h1>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni reiciendis accusamus autem tenetur vero, facilis omnis, ullam quis mollitia deleniti ea similique laboriosam numquam ab dignissimos!
+          </p>
 
-      {/* CALL TO ACTION */}
-      <section className="cta-band" id="donate">
-        <div className="cta-content container">
-          <h2>Your generosity fuels the mission</h2>
-          <a className="btn btn-primary" href="#">
-            <i className="fi fi-rr-hand-holding-usd"></i>
-            Make a Donation
-          </a>
+          <div className="cont">
+            <img className="wow animated fadeIn slow" src={gallery1} alt="gallery1" />
+            <aside>
+              <img src={gallery3} alt="gallery3" className="wow animated flipInX delay-1s" />
+              <img src={gallery2} alt="gallery2" className="wow animated flipInX delay-1s slower" />
+              <img src={gallery4} alt="gallery4" className="wow animated flipInX delay-2s" />
+              <img src={gallery5} alt="gallery5" className="wow animated flipInX delay-2s slower" />
+            </aside>
+          </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="site-footer container">
-        <p>© {new Date().getFullYear()} Convoy of Hope • All rights reserved.</p>
-      </footer>
-    </div>
-  )
-}
+      {/* Section 5 - Contact Form */}
+      <section id="sec-5">
+        <div className="contactUs">
+          <div className="container">
+            <aside>
+              <h1>Do you have any questions?</h1>
+              <h2>Feel free to contact us!</h2>
+            </aside>
+            <form id="form" onSubmit={(e) => e.preventDefault()}>
+              <input type="text" name="name" placeholder="Name" required />
+              <input type="email" name="email" placeholder="Email" required />
+              <input type="text" name="message" placeholder="Message" required />
+              <input type="submit" value="Submit" id="submit" />
+              <p id="msg"></p>
+            </form>
+          </div>
+        </div>
+      </section>
 
-export default Homepage
+      {/* Section 6 - Footer Info */}
+      <section id="sec-6">
+        <div className="container">
+          <div className="about">
+            <h1>About</h1>
+            <h2>
+              CONVOY OF HOPE
+              <p>Lorem ipsum dolor sit amit.</p>
+            </h2>
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Delectus eius nisi repudiandae ipsam pariatur, quos perspiciatis eaque officia rerum odio modi sed fugiat mollitia? Rerum, architecto obcaecati!</p>
+            <div className="social">
+              <a href="#"><i className="fab fa-facebook-f"></i></a>
+              <a href="#"><i className="fab fa-twitter"></i></a>
+              <a href="#"><i className="fab fa-linkedin-in"></i></a>
+              <a href="#"><i className="fab fa-instagram"></i></a>
+              <a href="#"><i className="fab fa-youtube-square"></i></a>
+            </div>
+          </div>
+
+          <div className="links">
+            <h1>Explore Links</h1>
+            <a href="#">Our Services</a>
+            <a href="#">Meet Our Team</a>
+            <a href="#">Careers</a>
+            <a href="#">Help Center</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Our Terms</a>
+          </div>
+
+          <div className="contact">
+            <h1>Contact Us</h1>
+            <p>Nairobi, Kenya</p>
+            <p>convoyofhope@gmail.com</p>
+            <p>+254 00 00 1234<br />+254 00 00 1234</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 7 - Copyright */}
+      <section id="sec-7">
+        <div className="container">
+          <p>Copyright ©2025 | <span>Convoy of Hope</span></p>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Homepage;

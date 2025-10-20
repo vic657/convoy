@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 import {
   FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
@@ -10,7 +11,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 const API_BASE = import.meta.env.VITE_API_BASE;
 const countries = CountryList.getAll().sort((a, b) => a.name.localeCompare(b.name));
 
-const Navbar = ({ navigate }) => {
+const Navbar = () => {
+  const navigate = useNavigate(); // ✅ Get navigate inside the component
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -125,36 +127,36 @@ const Navbar = ({ navigate }) => {
   };
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setLoginError('');
+    e.preventDefault();
+    setLoginError('');
 
-  if (!recaptchaToken) {
-    setLoginError('Please complete the CAPTCHA.');
-    return;
-  }
+    if (!recaptchaToken) {
+      setLoginError('Please complete the CAPTCHA.');
+      return;
+    }
 
-  try {
-    const res = await axios.post('/login', {
-      email: loginData.email,
-      password: loginData.password,
-      recaptcha_token: recaptchaToken, 
-    });
+    try {
+      const res = await axios.post('/login', {
+        email: loginData.email,
+        password: loginData.password,
+        recaptcha_token: recaptchaToken,
+      });
 
-    const { token, user } = res.data;
+      const { token, user } = res.data;
 
-    localStorage.setItem('auth_token', token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      localStorage.setItem('auth_token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-    alert(`Welcome back, ${user.name}`);
-    setShowLogin(false);
-    setLoginData({ email: '', password: '' });
-    setRecaptchaToken(''); // optional: reset token
-    navigate('/userdashboard');
-  } catch (err) {
-    console.error(err);
-    setLoginError(err.response?.data?.error || 'Login failed');
-  }
-};
+      alert(`Welcome back, ${user.name}`);
+      setShowLogin(false);
+      setLoginData({ email: '', password: '' });
+      setRecaptchaToken('');
+      navigate('/userdashboard'); // ✅ Works now
+    } catch (err) {
+      console.error(err);
+      setLoginError(err.response?.data?.error || 'Login failed');
+    }
+  };
 
 
   return (
