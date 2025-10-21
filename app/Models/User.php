@@ -26,6 +26,7 @@ class User extends Authenticatable
     'nationality',
     'phone',
     'passport_id',
+    'role',
 ];
 
 
@@ -51,4 +52,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function isAdmin()
+{
+    return $this->role === 'admin';
+}
+
 }

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import {
   FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
-  FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash
+  FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash, FaUserCircle
 } from 'react-icons/fa';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import axios from '../axios';
@@ -12,7 +12,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 const countries = CountryList.getAll().sort((a, b) => a.name.localeCompare(b.name));
 
 const Navbar = () => {
-  const navigate = useNavigate(); // ✅ Get navigate inside the component
+  const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -29,13 +29,8 @@ const Navbar = () => {
   const [recaptchaToken, setRecaptchaToken] = useState('');
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    nationality: '',
-    phone: '',
-    passportId: '',
-    password: '',
-    confirmPassword: '',
+    name: '', email: '', nationality: '', phone: '',
+    passportId: '', password: '', confirmPassword: ''
   });
 
   const registerRef = useRef();
@@ -68,14 +63,12 @@ const Navbar = () => {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     try {
       const res = await fetch(`${API_BASE}/v1/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email }),
       });
-
       const data = await res.json();
       if (res.ok) {
         setOtpSent(true);
@@ -106,7 +99,6 @@ const Navbar = () => {
           password: formData.password,
         }),
       });
-
       const data = await res.json();
       if (res.ok) {
         alert('Registration successful!');
@@ -129,39 +121,48 @@ const Navbar = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
-
     if (!recaptchaToken) {
       setLoginError('Please complete the CAPTCHA.');
       return;
     }
-
     try {
       const res = await axios.post('/login', {
         email: loginData.email,
         password: loginData.password,
         recaptcha_token: recaptchaToken,
       });
-
       const { token, user } = res.data;
 
       localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(user)); // Save user info
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       alert(`Welcome back, ${user.name}`);
       setShowLogin(false);
       setLoginData({ email: '', password: '' });
       setRecaptchaToken('');
-      navigate('/userdashboard'); // ✅ Works now
+
+      if (user.role === 'admin') navigate('/admindashboard');
+      else navigate('/userdashboard');
+
     } catch (err) {
       console.error(err);
       setLoginError(err.response?.data?.error || 'Login failed');
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    navigate('/');
+    window.location.reload(); // optional: reload to reset navbar state
+  };
+
+  const user = JSON.parse(localStorage.getItem('auth_user')); // Detect logged-in user
 
   return (
     <header>
-      {/* contact strip */}
+      {/* Contact strip */}
       <div className="contact-strip">
         <div className="contact-left">
           <span><FaPhoneAlt /> +254 705 798 382</span>
@@ -172,207 +173,165 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* navbar */}
+      {/* Navbar */}
       <nav className="main-nav">
         <div className="logo">
           <h1 style={{ margin: 0, color: '#EA580C', fontWeight: '800' }}>convoy of hope</h1>
           <p>Delivering food, supplies, and hope to communities in need.</p>
         </div>
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
-        <ul className={`nav-links ${menuOpen ? 'open' : ''}`} >
+        <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
           <li><a href="#home">Home</a></li>
-            <li><a href="#impact">Impact</a></li>
-            <li><a href="#programs">Programs</a></li>
-            <li><a href="#volunteer">Volunteer</a></li>
-            <li><a href="#blog">Blog</a></li>
-            <li><a href="#contact">Contact</a></li>
-          <li style={{ listStyle: 'none' }}>
-    <button
-      onClick={() => setShowLogin(true)}
-      style={{
-        background: '#EA580C',
-        color: 'white',
-        padding: '0.5rem 1.2rem',
-        borderRadius: '6px',
-        border: 'none',
-        textDecoration: 'none',
-        fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.background = '#f97316'; // lighter orange
-        e.target.style.transform = 'translateY(-2px)';
-        e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.4)';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.background = '#EA580C';
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = 'none';
-      }}
-    >
-      Donate
-    </button>
-  </li>
+          <li><a href="#impact">Impact</a></li>
+          <li><a href="#programs">Programs</a></li>
+          <li><a href="#volunteer">Volunteer</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#contact">Contact</a></li>
 
-  {/* Register Button */}
-  <li style={{ listStyle: 'none' }}>
-    <button
-      onClick={() => setShowRegister(true)}
-      style={{
-        background: 'transparent',
-        color: '#EA580C',
-        border: '2px solid #EA580C',
-        padding: '0.45rem 1.1rem',
-        borderRadius: '6px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.background = '#EA580C';
-        e.target.style.color = 'white';
-        e.target.style.transform = 'translateY(-2px)';
-        e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.3)';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.background = 'transparent';
-        e.target.style.color = '#EA580C';
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = 'none';
-      }}
-    >
-      Register
-    </button>
-  </li>
+          {/* Conditional Buttons */}
+          {!user ? (
+            <>
+              <li style={{ listStyle: 'none' }}>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  style={{
+                    background: '#EA580C',
+                    color: 'white',
+                    padding: '0.5rem 1.2rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#f97316';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#EA580C';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  Donate
+                </button>
+              </li>
+
+              <li style={{ listStyle: 'none' }}>
+                <button
+                  onClick={() => setShowRegister(true)}
+                  style={{
+                    background: 'transparent',
+                    color: '#EA580C',
+                    border: '2px solid #EA580C',
+                    padding: '0.45rem 1.1rem',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#EA580C';
+                    e.target.style.color = 'white';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 10px rgba(234,88,12,0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = '#EA580C';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  Register
+                </button>
+              </li>
+            </>
+          ) : (
+            <li style={{ listStyle: 'none', marginLeft: 'auto' }}>
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'
+                }}
+              >
+                <FaUserCircle size={24} />
+                <span>{user.name}</span>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    marginLeft: '0.5rem',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '4px',
+                    border: 'none',
+                    background: '#EA580C',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            </li>
+          )}
         </ul>
       </nav>
 
-{/* Registration Modal */}
-{showRegister && (
-  <div
-    className="modal-overlay"
-    onClick={(e) => {
-      if (e.target.classList.contains("modal-overlay")) setShowRegister(false);
-    }}
-    onKeyDown={(e) => e.key === "Escape" && setShowRegister(false)}
-    tabIndex={0}
-  >
-    <div className="modal-content" ref={registerRef}>
-      {/* Orange Round Close Button */}
-      <button
-        onClick={() => setShowRegister(false)}
-        className="close-circle"
-      >
-        ✕
-      </button>
-
-      <h2 className="modal-title">Register</h2>
-      <form onSubmit={handleSendOtp}>
-        {errors.length > 0 && (
-          <div className="alert-danger">
-            <ul>{errors.map((err, i) => <li key={i}>{err}</li>)}</ul>
+      {/* Registration Modal */}
+      {showRegister && (
+        <div className="modal-overlay" onClick={(e) => e.target.classList.contains("modal-overlay") && setShowRegister(false)} tabIndex={0}>
+          <div className="modal-content" ref={registerRef}>
+            <button onClick={() => setShowRegister(false)} className="close-circle">✕</button>
+            <h2 className="modal-title">Register</h2>
+            <form onSubmit={handleSendOtp}>
+              {errors.length > 0 && <div className="alert-danger"><ul>{errors.map((err, i) => <li key={i}>{err}</li>)}</ul></div>}
+              <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
+              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+              <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
+              <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
+                <option value="">Select Nationality</option>
+                {countries.map((country) => <option key={country.name} value={country.name}>{country.flag} {country.name}</option>)}
+              </select>
+              <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
+              <div style={{ position: 'relative' }}>
+                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
+                <span onClick={() => setShowPassword(!showPassword)} className="eye-icon">{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
+                <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="eye-icon">{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}</span>
+              </div>
+              <button type="submit" className="primary-btn">Send OTP</button>
+            </form>
+            <p className="switch-text">
+              Already have an account?{" "}
+              <span className="switch-link" onClick={() => { setShowRegister(false); setShowLogin(true); }}>Login</span>
+            </p>
           </div>
-        )}
-        <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-        <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-        <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
-          <option value="">Select Nationality</option>
-          {countries.map((country) => (
-            <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
-          ))}
-        </select>
-        <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
-        <div style={{ position: 'relative' }}>
-          <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password"
-            value={formData.password} onChange={handleChange} />
-          <span onClick={() => setShowPassword(!showPassword)} className="eye-icon">
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
         </div>
-        <div style={{ position: 'relative' }}>
-          <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password"
-            value={formData.confirmPassword} onChange={handleChange} />
-          <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="eye-icon">
-            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
+      )}
+
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="modal-overlay" onClick={(e) => e.target.classList.contains("modal-overlay") && setShowLogin(false)} tabIndex={0}>
+          <div className="modal-content" ref={loginRef}>
+            <button onClick={() => setShowLogin(false)} className="close-circle">✕</button>
+            <h2 className="modal-title">Login</h2>
+            <form onSubmit={handleLogin}>
+              {loginError && <div className="alert-danger">{loginError}</div>}
+              <input type="email" name="email" placeholder="Email" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} />
+              <input type="password" name="password" placeholder="Password" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} />
+              <ReCAPTCHA sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb" onChange={(token) => setRecaptchaToken(token)} />
+              <button type="submit" className="primary-btn">Login</button>
+            </form>
+            <p className="switch-text">
+              Don’t have an account?{" "}
+              <span className="switch-link" onClick={() => { setShowLogin(false); setShowRegister(true); }}>Register</span>
+            </p>
+          </div>
         </div>
-        <button type="submit" className="primary-btn">Send OTP</button>
-      </form>
-
-      {/* Switch to login */}
-      <p className="switch-text">
-        Already have an account?{" "}
-        <span
-          className="switch-link"
-          onClick={() => {
-            setShowRegister(false);
-            setShowLogin(true);
-          }}
-        >
-          Login
-        </span>
-      </p>
-    </div>
-  </div>
-)}
-
-{/* Login Modal */}
-{showLogin && (
-  <div
-    className="modal-overlay"
-    onClick={(e) => {
-      if (e.target.classList.contains("modal-overlay")) setShowLogin(false);
-    }}
-    onKeyDown={(e) => e.key === "Escape" && setShowLogin(false)}
-    tabIndex={0}
-  >
-    <div className="modal-content" ref={loginRef}>
-      <button onClick={() => setShowLogin(false)} className="close-circle">✕</button>
-
-      <h2 className="modal-title">Login</h2>
-      <form onSubmit={handleLogin}>
-        {loginError && <div className="alert-danger">{loginError}</div>}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={loginData.email}
-          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={loginData.password}
-          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-        />
-
-        <ReCAPTCHA
-          sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb"
-          onChange={(token) => setRecaptchaToken(token)}
-        />
-
-        <button type="submit" className="primary-btn">Login</button>
-      </form>
-
-      {/* Switch to Register */}
-      <p className="switch-text">
-        Don’t have an account?{" "}
-        <span
-          className="switch-link"
-          onClick={() => {
-            setShowLogin(false);
-            setShowRegister(true);
-          }}
-        >
-          Register
-        </span>
-      </p>
-    </div>
-  </div>
-)}
+      )}
 
       {/* OTP Verification Modal */}
       {showOtpModal && (

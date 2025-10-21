@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/test', function () {
     return response()->json([
@@ -17,5 +18,8 @@ Route::prefix('v1/auth')->middleware(['api'])->group(function () {
     Route::post('/verify-otp-register', [AuthController::class, 'registerWithOtp']);
 });
 
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+});
 
 
