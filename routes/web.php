@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-// Serve React SPA from root
+// routes/web.php
 Route::get('/{any}', function () {
-    return view('react');
-})->where('any', '.*'); //  catch-all so React handles client-side routing
+    return view('index');
+})->where('any', '^(?!api).*$');  // exclude API routes

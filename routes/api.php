@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\UserController;
 Route::get('/test', function () {
     return response()->json([
         'message' => 'API route is working in Laravel 12 🚀'
@@ -20,6 +20,14 @@ Route::prefix('v1/auth')->middleware(['api'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    // in routes/api.php
+Route::get('/users', [AdminController::class, 'getUsers']);
+Route::post('/users', [UserController::class, 'store']);
+Route::get('/staff', [AdminController::class, 'getStaff']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+
+
 });
 
-
+Route::get('/users', [UserController::class, 'index']);

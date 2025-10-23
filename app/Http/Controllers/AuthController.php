@@ -125,5 +125,35 @@ class AuthController extends Controller
         'token' => $token,
     ]);
 }
+/**
+ * Direct registration by Admin (no OTP required)
+ */
+public function registerDirect(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+        'role' => 'required|string|in:user,staff,admin',
+        'passportId' => 'nullable|string|max:50',
+        'phone' => 'nullable|string|max:20',
+        'nationality' => 'nullable|string|max:100',
+    ]);
+
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        'role' => $validated['role'],
+        'passport_id' => $validated['passportId'] ?? null,
+        'phone' => $validated['phone'] ?? null,
+        'nationality' => $validated['nationality'] ?? null,
+    ]);
+
+    return response()->json([
+        'message' => 'User registered successfully',
+        'user' => $user
+    ], 201);
+}
 
 }

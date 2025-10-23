@@ -5,7 +5,8 @@ import {
   FaPhoneAlt, FaEnvelope, FaEye, FaEyeSlash, FaUserCircle
 } from 'react-icons/fa';
 import CountryList from 'country-list-with-dial-code-and-flag';
-import axios from '../axios';
+import { authAxios } from '../axios';
+
 import ReCAPTCHA from 'react-google-recaptcha';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -126,7 +127,8 @@ const Navbar = () => {
       return;
     }
     try {
-      const res = await axios.post('/login', {
+      const res = await authAxios.post('/login', {
+
         email: loginData.email,
         password: loginData.password,
         recaptcha_token: recaptchaToken,
@@ -289,10 +291,14 @@ const Navbar = () => {
               <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
               <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
               <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-              <select name="nationality" value={formData.nationality} onChange={handleNationalityChange}>
-                <option value="">Select Nationality</option>
-                {countries.map((country) => <option key={country.name} value={country.name}>{country.flag} {country.name}</option>)}
+              <select>
+                {countries.map((country, index) => (
+                  <option key={`${country.name}-${index}`} value={country.name}>
+                    {country.name}
+                  </option>
+                ))}
               </select>
+
               <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
               <div style={{ position: 'relative' }}>
                 <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />

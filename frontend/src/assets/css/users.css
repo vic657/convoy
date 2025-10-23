@@ -1,0 +1,271 @@
+.users-container {
+  padding: 20px;
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+.users-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tab-buttons button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #555;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-buttons button.active {
+  border-color: #f57c00;
+  color: #f57c00;
+  font-weight: bold;
+}
+
+.register-btn {
+  background: #f57c00;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.register-btn:hover {
+  background: #e66d00;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+.search-bar .search-icon {
+  color: #999;
+  margin-right: 8px;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  flex: 1;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f57c00;
+  color: #fff;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions .edit {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.actions .delete {
+  color: #e63946;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.pagination button {
+  background: #f57c00;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Inline Form */
+.inline-form {
+  margin-top: 25px;
+  padding: 20px;
+  background: #fff8f0;
+  border: 1px solid #f57c00;
+  border-radius: 10px;
+  animation: slideDown 0.4s ease;
+}
+
+.inline-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inline-form input,
+.inline-form select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+}
+
+.cancel-btn {
+  background: #999;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tab-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+/* Bulk action bar (when selecting multiple rows) */
+.bulk-bar {
+  background: #fff5eb;
+  border: 1px solid #ffd6a8;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-delete {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.bulk-delete:hover {
+  background: #c53030;
+}
+
+/* Slight checkbox styling */
+table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ensure inline form sits nicely after table on small screens */
+.inline-form {
+  margin-top: 18px;
+}
+/*password icon*/
+/* ===== Password Field Styling ===== */
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 40px; /* space for the icon */
+}
+
+.password-field .toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.password-field .toggle-password:hover {
+  color: #000;
+}
