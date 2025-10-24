@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EventController;
+
+
 Route::get('/test', function () {
     return response()->json([
         'message' => 'API route is working in Laravel 12 🚀'
@@ -26,6 +29,8 @@ Route::post('/users', [UserController::class, 'store']);
 Route::get('/staff', [AdminController::class, 'getStaff']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 Route::put('/users/{id}', [UserController::class, 'update']);
+// programs
+Route::apiResource('events', EventController::class);
 
 
 });

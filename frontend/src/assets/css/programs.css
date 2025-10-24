@@ -1,0 +1,181 @@
+.programs-container {
+  padding: 20px;
+}
+
+.programs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.add-btn {
+  background: #f57c00;
+  color: #fff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.3s;
+}
+.add-btn:hover {
+  background: #e06900;
+}
+
+.search-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-box,
+.filter-box {
+  position: relative;
+  flex: 1;
+}
+
+.search-box .icon,
+.filter-box .icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.search-box input,
+.filter-box input {
+  width: 100%;
+  padding: 8px 10px 8px 30px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* was 280px */
+  gap: 12px; /* slightly reduced gap */
+}
+
+.event-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.event-image {
+  width: 100%;
+  height: 130px; /* was 160px */
+  object-fit: cover;
+}
+
+.event-content {
+  padding: 10px; /* was 12px */
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.event-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px; /* was 10px */
+  border-top: 1px solid #eee;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 5px 9px; /* slightly smaller buttons */
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+
+.edit-btn {
+  background: #0288d1;
+}
+
+.delete-btn {
+  background: #d32f2f;
+}
+
+.event-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-form input,
+.event-form textarea,
+.event-form select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-btn {
+  background: #43a047;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #9e9e9e;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.event-content .desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* show one line by default */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.event-content .desc.expanded {
+  -webkit-line-clamp: unset; /* remove the one-line limit */
+  overflow: visible;
+  white-space: normal;
+  cursor: pointer;
+}
+
