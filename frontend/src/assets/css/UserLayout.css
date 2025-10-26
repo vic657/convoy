@@ -1,0 +1,177 @@
+
+aside.sidebar {
+  position: fixed !important;
+  top: 125px; /* Default for large desktop */
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 125px);
+  background: #1a1a1a;
+  color: #fff;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  z-index: 5000;
+  display: block;
+}
+
+/* Collapsed Sidebar */
+aside.sidebar.collapsed {
+  width: 70px;
+}
+
+/* Header */
+aside.sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+aside.sidebar .sidebar-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+}
+
+aside.sidebar .sidebar-title.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+aside.sidebar .toggle-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* Nav */
+aside.sidebar .sidebar-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+aside.sidebar .sidebar-nav li {
+  margin: 8px 0;
+}
+
+aside.sidebar .sidebar-nav a,
+aside.sidebar .sidebar-nav .logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+aside.sidebar .sidebar-nav a.active {
+  background: #f57c00;
+}
+
+aside.sidebar .sidebar-nav a:hover,
+aside.sidebar .sidebar-nav .logout:hover {
+  background: #333;
+}
+.main-content {
+  margin-left: 220px; 
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+/* When sidebar is collapsed */
+.sidebar.collapsed ~ .main-content {
+  margin-left: 70px;
+}
+
+/* ===== Responsive Top Adjustment ===== */
+
+/* 320px–480px: Small phones */
+@media (max-width: 480px) {
+  aside.sidebar {
+    top: 140px; /* Smaller navbar height */
+    width: 200px;
+    height: calc(100vh - 55px);
+  }
+}
+
+/* 481px–768px: Medium phones / small tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  aside.sidebar {
+    top: 162px;
+    height: calc(100vh - 65px);
+  }
+}
+
+/* 769px–1024px: Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  aside.sidebar {
+    top: 100px;
+    height: calc(100vh - 80px);
+  }
+}
+
+/* 1025px–1440px: Laptops / small desktops */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  aside.sidebar {
+    top: 110px;
+    height: calc(100vh - 110px);
+  }
+}
+
+/* 1441px+: Large monitors */
+@media (min-width: 1441px) {
+  aside.sidebar {
+    top: 125px;
+    height: calc(100vh - 125px);
+  }
+}
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 0; 
+  }
+}
+
+/* Ensure the whole page uses full viewport height */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* Prevent body scroll */
+}
+
+/* Navbar stays fixed at top */
+.dashboard > nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 6000; /* Above sidebar */
+}
+
+/* Main content scrollable */
+.main-content {
+  margin-left: 220px; /* sidebar width */
+  margin-top: 125px; /* navbar height */
+  padding: 20px;
+  height: calc(100vh - 125px); /* take remaining height */
+  overflow-y: auto; /* vertical scroll only */
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+/* When sidebar is collapsed */
+.sidebar.collapsed ~ .main-content {
+  margin-left: 70px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+

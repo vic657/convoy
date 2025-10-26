@@ -137,7 +137,8 @@ const Navbar = () => {
 
       localStorage.setItem('auth_token', token);
       localStorage.setItem('auth_user', JSON.stringify(user)); // Save user info
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
 
       alert(`Welcome back, ${user.name}`);
       setShowLogin(false);
@@ -291,13 +292,19 @@ const Navbar = () => {
               <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
               <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
               <input type="text" name="passportId" placeholder="Passport ID" value={formData.passportId} onChange={handleChange} />
-              <select>
-                {countries.map((country, index) => (
-                  <option key={`${country.name}-${index}`} value={country.name}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+              <select
+  name="nationality"
+  value={formData.nationality}
+  onChange={handleNationalityChange}
+>
+  <option value="">-- Select Nationality --</option>
+  {countries.map((country, index) => (
+    <option key={`${country.name}-${index}`} value={country.name}>
+      {country.name}
+    </option>
+  ))}
+</select>
+
 
               <input type="text" name="phone" placeholder={`Phone (${countryCode})`} value={formData.phone} onChange={handleChange} />
               <div style={{ position: 'relative' }}>
