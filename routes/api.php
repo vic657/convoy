@@ -31,8 +31,11 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 // programs
 Route::apiResource('events', EventController::class);
+Route::get('/events', [EventController::class, 'index']);
+
 
 
 });
 
 Route::get('/users', [UserController::class, 'index']);
+Route::get('/events', [EventController::class, 'index']);

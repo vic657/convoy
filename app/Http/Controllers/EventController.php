@@ -10,8 +10,16 @@ class EventController extends Controller
 {
     public function index()
     {
-        return response()->json(Event::orderBy('date', 'desc')->get());
-    }
+    return response()->json(Event::orderBy('date', 'desc')->get());
+    $upcoming = Event::where('date', '>=', now())->orderBy('date', 'asc')->get();
+    $past = Event::where('date', '<', now())->orderBy('date', 'desc')->get();
+
+    return response()->json([
+        'upcoming' => $upcoming,
+        'past' => $past,
+    ]);
+}
+
 
     public function store(Request $request)
     {
@@ -76,5 +84,6 @@ class EventController extends Controller
 
         return response()->json(['message' => 'Event deleted successfully']);
     }
+    
 }
 
