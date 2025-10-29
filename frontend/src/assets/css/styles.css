@@ -1011,5 +1011,134 @@ text-shadow:1px 1px #73757E;
         width: 1340px;
     }
 }
+/* ======== Upcoming Events Section ======== */
+#events-hero {
+  background: #f8f9fa;
+  padding: 60px 0;
+  position: relative;
+}
+
+#events-hero .events-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+#events-hero h2 {
+  font-size: 2rem;
+  margin-bottom: 25px;
+  color: #f06407;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.event-slider {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  justify-content: center;
+}
+
+.event-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.event-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.event-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-slide .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3), transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.event-info {
+  color: #fff;
+  text-align: left;
+}
+
+.event-info h3 {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+
+.event-info p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.no-events {
+  background: #eee;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-style: italic;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border: none;
+  font-size: 2rem;
+  padding: 8px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.nav-btn.prev {
+  left: 15px;
+}
+
+.nav-btn.next {
+  right: 15px;
+}
+
+@media (max-width: 768px) {
+  #events-hero h2 {
+    font-size: 1.5rem;
+  }
+
+  .event-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .event-slider {
+    height: 250px;
+  }
+  
+}
 
 /* END OF SHEET */

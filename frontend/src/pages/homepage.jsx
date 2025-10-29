@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AOS from "aos";
+import "aos/dist/aos.css";
+import { apiAxios } from "../axios"; 
 
 import "../assets/css/bootstrap.min.css";
 import "../assets/css/all.min.css";
@@ -25,6 +27,11 @@ import gallery5 from "../assets/images/gallery5.jpg";
 import Navbar from "../Components/Navbar";
 
 const Homepage = () => {
+  const [events, setEvents] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const slideInterval = useRef(null);
+
+  // Initialize AOS animations
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -32,6 +39,51 @@ const Homepage = () => {
       offset: 100,
     });
   }, []);
+
+  // Fetch upcoming events
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const res = await apiAxios.get("/events");
+      if (Array.isArray(res.data)) {
+        setEvents(res.data);
+      } else if (res.data.upcoming) {
+        setEvents(res.data.upcoming);
+      } else {
+        setEvents([]);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  // Hero auto-slide logic
+  useEffect(() => {
+    if (events.length > 0) startAutoSlide();
+    return () => stopAutoSlide();
+  }, [events]);
+
+  const startAutoSlide = () => {
+    stopAutoSlide();
+    slideInterval.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % events.length);
+    }, 4000);
+  };
+
+  const stopAutoSlide = () => {
+    if (slideInterval.current) clearInterval(slideInterval.current);
+  };
+
+  const nextSlide = () => {
+    setActiveIndex((prev) => (prev + 1) % events.length);
+  };
+
+  const prevSlide = () => {
+    setActiveIndex((prev) => (prev - 1 + events.length) % events.length);
+  };
 
   return (
     <>
@@ -57,6 +109,52 @@ const Homepage = () => {
         </article>
       </section>
 
+      
+     {/* === Events Hero Slider (with description) === */}
+<section id="events-hero">
+  <div className="events-container">
+    <h2>Upcoming Events</h2>
+
+    <div className="event-slider">
+      {events.length > 0 ? (
+        events.map((event, index) => (
+          <div
+            key={event.id}
+            className={`event-slide ${index === activeIndex ? "active" : ""}`}
+          >
+            <img
+              src={`http://127.0.0.1:8000/storage/${event.image.replace(/^storage\//, "")}`}
+              alt={event.title}
+            />
+            <div className="overlay">
+              <div className="event-info">
+                <h3>{event.title}</h3>
+                <p>{event.date} • {event.venue}</p>
+                <p className="desc">
+                  {event.description?.length > 150
+                    ? event.description.slice(0, 150) + "..."
+                    : event.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="no-events">No upcoming events yet.</div>
+      )}
+
+      {events.length > 1 && (
+        <>
+          <button className="nav-btn prev" onClick={prevSlide}>‹</button>
+          <button className="nav-btn next" onClick={nextSlide}>›</button>
+        </>
+      )}
+    </div>
+  </div>
+</section>
+
+
+
       {/* Section 1 - Welcome */}
       <section id="sec-1">
         <div className="container">
@@ -74,7 +172,6 @@ const Homepage = () => {
           </aside>
         </div>
       </section>
-
       {/* Section 2 - Why Choose Us */}
       <section id="sec-2">
         <div className="container">

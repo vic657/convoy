@@ -5,15 +5,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\DonationController;
 
-
+// ============================
+// TEST ROUTE
+// ============================
 Route::get('/test', function () {
     return response()->json([
         'message' => 'API route is working in Laravel 12 🚀'
     ]);
 });
 
-// Grouped under /api/v1/auth
+// ============================
+// AUTH ROUTES
+// ============================
 Route::prefix('v1/auth')->middleware(['api'])->group(function () {
     Route::post('/register', [AuthController::class, 'registerDirect']);
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -21,21 +26,41 @@ Route::prefix('v1/auth')->middleware(['api'])->group(function () {
     Route::post('/verify-otp-register', [AuthController::class, 'registerWithOtp']);
 });
 
+// ============================
+// ADMIN ROUTES
+// ============================
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-    // in routes/api.php
-Route::get('/users', [AdminController::class, 'getUsers']);
-Route::post('/users', [UserController::class, 'store']);
-Route::get('/staff', [AdminController::class, 'getStaff']);
-Route::delete('/users/{id}', [UserController::class, 'destroy']);
-Route::put('/users/{id}', [UserController::class, 'update']);
-// programs
-Route::apiResource('events', EventController::class);
-Route::get('/events', [EventController::class, 'index']);
 
+    // User Management
+    Route::get('/users', [AdminController::class, 'getUsers']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
 
+    // Staff
+    Route::get('/staff', [AdminController::class, 'getStaff']);
 
+    // Events CRUD
+    Route::apiResource('events', EventController::class);
 });
 
+// ============================
+// PUBLIC ROUTES
+// ============================
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/events', [EventController::class, 'index']);
+
+// ============================
+// DONATION ROUTES
+// ============================
+
+// Publicly viewable
+Route::get('/donations', [DonationController::class, 'index']);
+Route::get('/events/{id}/donations', [DonationController::class, 'showByEvent']);
+
+// Logged-in user actions
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/donations', [DonationController::class, 'store']);
+    Route::get('/donations/user', [DonationController::class, 'userDonations']); // ✅ Add this line
+});
