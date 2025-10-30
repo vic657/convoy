@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DonationController extends Controller
 {
+    // ==========================
+    // Store Donation
+    // ==========================
     public function store(Request $request)
     {
-        // Basic validation
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
             'type' => 'required|in:money,item,other',
@@ -23,25 +25,20 @@ class DonationController extends Controller
             'message' => 'nullable|string',
         ]);
 
-        // Custom logic based on donation type
-        if ($validated['type'] === 'money') {
-            if (empty($validated['amount'])) {
-                return response()->json(['message' => 'Amount is required for money donations'], 422);
-            }
-        } else {
-            // Non-money donations: clear amount
-            $validated['amount'] = null;
+        // Validate money donation
+        if ($validated['type'] === 'money' && empty($validated['amount'])) {
+            return response()->json(['message' => 'Amount is required for money donations'], 422);
         }
 
         $user = Auth::user();
 
         $donation = Donation::create([
-            'user_id' => $user ? $user->id : null,
+            'user_id' => $user?->id,
             'event_id' => $validated['event_id'],
-            'donor_name' => $user ? $user->name : $request->input('donor_name', 'Anonymous Donor'),
-            'email' => $user ? $user->email : $request->input('email', null),
+            'donor_name' => $user?->name ?? $request->input('donor_name', 'Anonymous Donor'),
+            'email' => $user?->email ?? $request->input('email', null),
             'type' => $validated['type'],
-            'amount' => $validated['amount'],
+            'amount' => $validated['amount'] ?? null,
             'item_category' => $validated['item_category'] ?? null,
             'item_description' => $validated['item_description'] ?? null,
             'pickup_location' => $validated['pickup_location'] ?? null,
@@ -56,32 +53,110 @@ class DonationController extends Controller
         ], 201);
     }
 
+    // ==========================
+    // All Donations (Public)
+    // ==========================
     public function index()
     {
-        return response()->json(Donation::with('event')->latest()->get());
+        $donations = Donation::with('event:id,title,date,venue')
+            ->latest()
+            ->get()
+            ->map(fn($d) => [
+                'id' => $d->id,
+                'donor_name' => $d->donor_name,
+                'email' => $d->email,
+                'type' => $d->type,
+                'amount' => $d->amount,
+                'item_category' => $d->item_category,
+                'item_description' => $d->item_description,
+                'pickup_location' => $d->pickup_location,
+                'contact' => $d->contact,
+                'payment_method' => $d->payment_method,
+                'message' => $d->message,
+                'event' => [
+                    'id' => $d->event?->id,
+                    'title' => $d->event?->title,
+                    'date' => $d->event?->date,
+                    'venue' => $d->event?->venue,
+                ],
+                'created_at' => $d->created_at->format('Y-m-d H:i'),
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'donations' => $donations
+        ]);
     }
 
+    // ==========================
+    // Donations for Specific Event
+    // ==========================
     public function showByEvent($eventId)
     {
-        return response()->json(
-            Donation::where('event_id', $eventId)->with('event')->latest()->get()
-        );
+        $donations = Donation::where('event_id', $eventId)
+            ->with('event:id,title,date,venue')
+            ->latest()
+            ->get()
+            ->map(fn($d) => [
+                'id' => $d->id,
+                'donor_name' => $d->donor_name,
+                'type' => $d->type,
+                'amount' => $d->amount,
+                'item_category' => $d->item_category,
+                'item_description' => $d->item_description,
+                'pickup_location' => $d->pickup_location,
+                'contact' => $d->contact,
+                'payment_method' => $d->payment_method,
+                'message' => $d->message,
+                'event' => [
+                    'id' => $d->event?->id,
+                    'title' => $d->event?->title,
+                    'date' => $d->event?->date,
+                    'venue' => $d->event?->venue,
+                ],
+                'created_at' => $d->created_at->format('Y-m-d H:i'),
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'donations' => $donations
+        ]);
     }
 
+    // ==========================
+    // Logged-in User Donations
+    // ==========================
     public function userDonations()
     {
         $user = Auth::user();
+
         if (!$user) {
             return response()->json(['message' => 'Not authenticated'], 401);
         }
 
-        $donatedEventIds = Donation::where('user_id', $user->id)
-            ->pluck('event_id')
-            ->unique()
-            ->values();
+        $donations = Donation::with('event:id,title,date,venue')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get()
+            ->map(fn($d) => [
+                'id' => $d->id,
+                'type' => $d->type,
+                'amount' => $d->amount,
+                'item_category' => $d->item_category,
+                'item_description' => $d->item_description,
+                'payment_method' => $d->payment_method,
+                'event' => [
+                    'id' => $d->event?->id,
+                    'title' => $d->event?->title,
+                    'date' => $d->event?->date,
+                    'venue' => $d->event?->venue,
+                ],
+                'created_at' => $d->created_at->format('Y-m-d H:i'),
+            ]);
 
         return response()->json([
-            'donated_event_ids' => $donatedEventIds
+            'success' => true,
+            'donations' => $donations
         ]);
     }
 }

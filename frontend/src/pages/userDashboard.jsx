@@ -20,12 +20,17 @@ const UserDashboard = () => {
     pickup_location: "",
     contact: "",
   });
+  const [loading, setLoading] = useState(true);
 
   const slideInterval = useRef(null);
 
   useEffect(() => {
-    fetchEvents();
-    fetchUserDonations();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchEvents(), fetchUserDonations()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const fetchEvents = async () => {
@@ -108,13 +113,11 @@ const UserDashboard = () => {
       };
 
       await apiAxios.post("/donations", payload);
-
       setDonatedEvents((prev) => [...prev, donateEvent.id]);
 
       toast.success("Thank you for your donation!", {
         position: "top-center",
         autoClose: 3000,
-        hideProgressBar: false,
       });
 
       closeDonateModal();
@@ -126,7 +129,6 @@ const UserDashboard = () => {
       toast.error(errorMessage, {
         position: "top-center",
         autoClose: 4000,
-        hideProgressBar: false,
       });
     }
   };
@@ -135,110 +137,135 @@ const UserDashboard = () => {
 
   return (
     <div className="user-dashboard">
-      {/* === Hero Slider === */}
-      <div className="hero-slider">
-        {events.length > 0 ? (
-          events.map((event, index) => (
-            <div
-              key={event.id}
-              className={`slide ${index === activeIndex ? "active" : ""}`}
-              onClick={() => handleEventClick(event)}
-            >
-              <img
-                src={`http://127.0.0.1:8000/storage/${event.image.replace(/^storage\//, "")}`}
-                alt={event.title}
-              />
-              <div className="overlay"></div>
-              <div className="event-info">
-                <h2>{event.title}</h2>
-                <p>{event.date} • {event.venue}</p>
-              </div>
+      {loading ? (
+        <div className="loader-container">
+          <div className="loader"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      ) : (
+        <>
+          {/* === Hero Slider === */}
+          <div className="hero-slider">
+            {events.length > 0 ? (
+              events.map((event, index) => (
+                <div
+                  key={event.id}
+                  className={`slide ${index === activeIndex ? "active" : ""}`}
+                  onClick={() => handleEventClick(event)}
+                >
+                  <img
+                    src={`http://127.0.0.1:8000/storage/${event.image.replace(/^storage\//, "")}`}
+                    alt={event.title}
+                  />
+                  <div className="overlay"></div>
+                  <div className="event-info">
+                    <h2>{event.title}</h2>
+                    <p>
+                      {event.date} • {event.venue}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="no-events">No upcoming events yet.</div>
+            )}
+
+            {events.length > 1 && (
+              <>
+                <button onClick={prevSlide} className="slide-btn prev-btn">
+                  ‹
+                </button>
+                <button onClick={nextSlide} className="slide-btn next-btn">
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* === Event Table === */}
+          <div className="event-table-section">
+            <div className="event-table-header">
+              <h3>{showPast ? "Past Events" : "Upcoming Events"}</h3>
+              <button onClick={() => setShowPast(!showPast)} className="toggle-btn">
+                {showPast ? "Show Upcoming" : "Show Past"}
+              </button>
             </div>
-          ))
-        ) : (
-          <div className="no-events">No upcoming events yet.</div>
-        )}
 
-        {events.length > 1 && (
-          <>
-            <button onClick={prevSlide} className="slide-btn prev-btn">‹</button>
-            <button onClick={nextSlide} className="slide-btn next-btn">›</button>
-          </>
-        )}
-      </div>
-
-      {/* === Event Table === */}
-      <div className="event-table-section">
-        <div className="event-table-header">
-          <h3>{showPast ? "Past Events" : "Upcoming Events"}</h3>
-          <button onClick={() => setShowPast(!showPast)} className="toggle-btn">
-            {showPast ? "Show Upcoming" : "Show Past"}
-          </button>
-        </div>
-
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Venue</th>
-                <th>Target</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentEvents.length > 0 ? (
-                currentEvents.map((event) => (
-                  <tr key={event.id} className="event-row">
-                    <td onClick={() => handleEventClick(event)}>{event.title}</td>
-                    <td>{event.date}</td>
-                    <td>{event.venue}</td>
-                    <td>
-                      {event.target_amount
-                        ? `Ksh ${Number(event.target_amount).toLocaleString()}`
-                        : "-"}
-                    </td>
-                    <td>
-                      {donatedEvents.includes(event.id) ? (
-                        <button className="donated-btn" disabled>Donated</button>
-                      ) : (
-                        <button className="donate-btn" onClick={() => openDonateModal(event)}>
-                          Donate
-                        </button>
-                      )}
-                    </td>
+            <div className="table-wrapper scrollable">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Target</th>
+                    <th>Action</th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="no-events-row">
-                    No {showPast ? "past" : "upcoming"} events available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
+                <tbody>
+                  {currentEvents.length > 0 ? (
+                    currentEvents.map((event) => (
+                      <tr key={event.id} className="event-row">
+                        <td onClick={() => handleEventClick(event)}>{event.title}</td>
+                        <td>{event.date}</td>
+                        <td>{event.venue}</td>
+                        <td>
+                          {event.target_amount
+                            ? `Ksh ${Number(event.target_amount).toLocaleString()}`
+                            : "-"}
+                        </td>
+                        <td>
+                          {donatedEvents.includes(event.id) ? (
+                            <button className="donated-btn" disabled>
+                              Donated
+                            </button>
+                          ) : (
+                            <button className="donate-btn" onClick={() => openDonateModal(event)}>
+                              Donate
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="no-events-row">
+                        No {showPast ? "past" : "upcoming"} events available.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* === Event Modal === */}
       {selectedEvent && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeModal}>✕</button>
+            <button className="modal-close" onClick={closeModal}>
+              ✕
+            </button>
             <img
               src={`http://127.0.0.1:8000/storage/${selectedEvent.image.replace(/^storage\//, "")}`}
               alt={selectedEvent.title}
               className="modal-image"
             />
             <h2 className="modal-title">{selectedEvent.title}</h2>
-            <p className="modal-meta">{selectedEvent.date} • {selectedEvent.venue}</p>
-            <p className="modal-target">Target: Ksh {Number(selectedEvent.target_amount).toLocaleString()}</p>
+            <p className="modal-meta">
+              {selectedEvent.date} • {selectedEvent.venue}
+            </p>
+            <p className="modal-target">
+              Target: Ksh {Number(selectedEvent.target_amount).toLocaleString()}
+            </p>
             <p className="modal-description">{selectedEvent.description}</p>
 
             {donatedEvents.includes(selectedEvent.id) ? (
-              <button className="donated-btn" disabled>Donated</button>
+              <button className="donated-btn" disabled>
+                Donated
+              </button>
             ) : (
               <button className="donate-btn" onClick={() => openDonateModal(selectedEvent)}>
                 Donate
@@ -252,7 +279,9 @@ const UserDashboard = () => {
       {donateEvent && (
         <div className="modal-overlay" onClick={closeDonateModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeDonateModal}>✕</button>
+            <button className="modal-close" onClick={closeDonateModal}>
+              ✕
+            </button>
             <h2>Donate to: {donateEvent.title}</h2>
 
             <div className="donation-toggle">

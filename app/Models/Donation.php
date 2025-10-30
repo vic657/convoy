@@ -14,12 +14,12 @@ class Donation extends Model
         'event_id',
         'donor_name',
         'email',
-        'type', // ✅ added
+        'type', 
         'amount',
-        'item_category', // ✅ added
-        'item_description', // ✅ added
-        'pickup_location', // ✅ added
-        'contact', // ✅ added
+        'item_category', 
+        'item_description', 
+        'pickup_location', 
+        'contact', 
         'payment_method',
         'transaction_id',
         'message',

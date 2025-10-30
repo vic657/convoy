@@ -454,3 +454,123 @@ th, td {
 .donated-btn:hover {
   background-color: #218838;
 }
+/*payment history css*/
+/* ===== Payment History Styling ===== */
+.dashboard-title {
+  margin: 20px 0;
+  text-align: center;
+  font-size: 1.6rem;
+  color: #222;
+}
+
+.scrollable {
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.donation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.donation-table th,
+.donation-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.donation-table th {
+  background: #f6f6f6;
+  font-weight: 600;
+}
+
+.donation-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.no-events-row {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+.submit-donation {
+  background: #ff7b00;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-donation:hover {
+  background: #ff9b33;
+}
+/* ===== Loader ===== */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  color: #555;
+  font-size: 14px;
+}
+
+.loader {
+  border: 5px solid #eee;
+  border-top: 5px solid #ff9900;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Scrollable Table ===== */
+.table-wrapper.scrollable {
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ===== Buttons ===== */
+.donate-btn {
+  background: #ff9900;
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.donate-btn:hover {
+  background: #e68a00;
+}
