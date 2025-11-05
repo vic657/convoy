@@ -40,10 +40,17 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     // Staff
     Route::get('/staff', [AdminController::class, 'getStaff']);
+   
+
 
     // Events CRUD
     Route::apiResource('events', EventController::class);
 });
+// Allow both admin and staff/storekeepers to mark received
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::put('/donations/{id}/status', [DonationController::class, 'updateStatus']);
+});
+
 
 // ============================
 // PUBLIC ROUTES

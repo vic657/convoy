@@ -1,0 +1,109 @@
+/* ===== Store Layout Base ===== */
+.store-layout {
+  display: flex;
+  height: 100vh;
+  background: #f8f8f8;
+  color: #333;
+}
+
+/* ===== Sidebar ===== */
+.store-sidebar {
+  background: #1a1a1a;
+  color: #fff;
+  width: 230px;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.store-sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #ff7b00;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 0.8rem 1rem;
+  transition: background 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #333;
+}
+
+/* ===== Main Content ===== */
+.store-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Topbar ===== */
+.store-topbar {
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+/* ===== Page Content ===== */
+.store-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .store-sidebar {
+    position: fixed;
+    height: 100%;
+    z-index: 10;
+    left: -230px;
+  }
+
+  .store-sidebar.open {
+    left: 0;
+  }
+
+  .store-main {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,150 @@
+/* ===== Store Dashboard Styles ===== */
+
+.store-dashboard {
+  
+  background: #f9f9f9;
+  min-height: 100vh;
+  color: #222;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.store-header {
+  margin-left: 2rem;
+}
+
+.store-header h1 {
+  font-size: 2rem;
+  color: #ea580c;
+  margin-bottom: 0.3rem;
+}
+
+.store-header p {
+  color: #555;
+  font-size: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-left: 3rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  font-size: 2.2rem;
+  margin-right: 1rem;
+}
+
+.stat-icon.money {
+  color: #16a34a;
+}
+
+.stat-icon.box {
+  color: #3b82f6;
+}
+
+.stat-icon.chart {
+  color: #f59e0b;
+}
+
+.stat-icon.users {
+  color: #dc2626;
+}
+
+.stat-card h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #111;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* ===== Activity Section ===== */
+.recent-activity {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.recent-activity h2 {
+  color: #ea580c;
+  margin-bottom: 1rem;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  flex-direction: column;
+  border-left: 4px solid #ddd;
+  padding-left: 0.8rem;
+  position: relative;
+}
+
+.activity-item .time {
+  font-size: 0.8rem;
+  color: #999;
+  align-self: flex-end;
+}
+
+.activity-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.activity-badge.new {
+  background: #3b82f6;
+  color: white;
+}
+
+.activity-badge.success {
+  background: #16a34a;
+  color: white;
+}
+
+.activity-badge.pending {
+  background: #f59e0b;
+  color: white;
+}
+
+/* Scrollbar styling */
+.recent-activity::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recent-activity::-webkit-scrollbar-thumb {
+  background: #ea580c;
+  border-radius: 10px;
+}

@@ -5,14 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Donation;
 
 class EventController extends Controller
 {
     public function index()
-    {
-    return response()->json(Event::orderBy('date', 'desc')->get());
-    $upcoming = Event::where('date', '>=', now())->orderBy('date', 'asc')->get();
-    $past = Event::where('date', '<', now())->orderBy('date', 'desc')->get();
+{
+    $upcoming = Event::where('date', '>=', now())
+        ->orderBy('date', 'asc')
+        ->get()
+        ->map(function ($event) {
+            $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
+            $event->total_donations = $totalDonations;
+            $event->progress = $event->target_amount > 0
+                ? round(($totalDonations / $event->target_amount) * 100, 2)
+                : 0;
+            return $event;
+        });
+
+    $past = Event::where('date', '<', now())
+        ->orderBy('date', 'desc')
+        ->get()
+        ->map(function ($event) {
+            $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
+            $event->total_donations = $totalDonations;
+            $event->progress = $event->target_amount > 0
+                ? round(($totalDonations / $event->target_amount) * 100, 2)
+                : 0;
+            return $event;
+        });
 
     return response()->json([
         'upcoming' => $upcoming,

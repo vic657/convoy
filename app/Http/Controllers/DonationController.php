@@ -57,36 +57,38 @@ class DonationController extends Controller
     // All Donations (Public)
     // ==========================
     public function index()
-    {
-        $donations = Donation::with('event:id,title,date,venue')
-            ->latest()
-            ->get()
-            ->map(fn($d) => [
-                'id' => $d->id,
-                'donor_name' => $d->donor_name,
-                'email' => $d->email,
-                'type' => $d->type,
-                'amount' => $d->amount,
-                'item_category' => $d->item_category,
-                'item_description' => $d->item_description,
-                'pickup_location' => $d->pickup_location,
-                'contact' => $d->contact,
-                'payment_method' => $d->payment_method,
-                'message' => $d->message,
-                'event' => [
-                    'id' => $d->event?->id,
-                    'title' => $d->event?->title,
-                    'date' => $d->event?->date,
-                    'venue' => $d->event?->venue,
-                ],
-                'created_at' => $d->created_at->format('Y-m-d H:i'),
-            ]);
-
-        return response()->json([
-            'success' => true,
-            'donations' => $donations
+{
+    $donations = Donation::with('event:id,title,date,venue,target_amount')
+        ->latest()
+        ->get()
+        ->map(fn($d) => [
+            'id' => $d->id,
+            'donor_name' => $d->donor_name,
+            'email' => $d->email,
+            'type' => $d->type,
+            'amount' => $d->amount,
+            'item_category' => $d->item_category,
+            'item_description' => $d->item_description,
+            'pickup_location' => $d->pickup_location,
+            'contact' => $d->contact,
+            'payment_method' => $d->payment_method,
+            'message' => $d->message,
+            'event' => [
+                'id' => $d->event?->id,
+                'title' => $d->event?->title,
+                'date' => $d->event?->date,
+                'venue' => $d->event?->venue,
+                'target_amount' => $d->event?->target_amount,
+            ],
+            'created_at' => $d->created_at->format('Y-m-d H:i'),
         ]);
-    }
+
+    return response()->json([
+        'success' => true,
+        'donations' => $donations
+    ]);
+}
+
 
     // ==========================
     // Donations for Specific Event
@@ -159,4 +161,32 @@ class DonationController extends Controller
             'donations' => $donations
         ]);
     }
+public function updateStatus(Request $request, $id)
+{
+    $donation = Donation::findOrFail($id);
+
+    // Only apply to non-cash donations
+    if ($donation->type === 'money') {
+        return response()->json(['message' => 'Cannot update cash donations.'], 400);
+    }
+
+    // Validate input
+    $validated = $request->validate([
+        'status' => 'required|string|in:received,pending',
+        'item_name' => 'nullable|string|max:255',
+        'quantity' => 'nullable|numeric',
+        'unit' => 'nullable|string|max:50',
+        'condition' => 'nullable|string|max:100',
+        'remarks' => 'nullable|string|max:500',
+    ]);
+
+    // Update record
+    $donation->update($validated);
+
+    return response()->json([
+        'message' => 'Donation status updated successfully.',
+        'donation' => $donation
+    ]);
+}
+
 }

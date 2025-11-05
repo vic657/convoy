@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaUsers, FaHome, FaBoxOpen, FaChartLine, FaCog, FaBars, FaSignOutAlt } from "react-icons/fa";
+import { FaUsers, FaHome,FaBell, FaBoxOpen, FaChartLine, FaCog, FaBars, FaSignOutAlt } from "react-icons/fa";
 import "./Sidebar.css";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -37,6 +37,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           <li>
             <NavLink to="/admin/reports">
               <FaChartLine /> {sidebarOpen && <span>Reports</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/reports">
+              <FaBell /> {sidebarOpen && <span>Notifications</span>}
             </NavLink>
           </li>
           <li>

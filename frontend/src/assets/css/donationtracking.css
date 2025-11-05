@@ -1,0 +1,98 @@
+.donation-tracking {
+  padding: 20px;
+  color: #fff;
+  background: #121212;
+  min-height: 100%;
+}
+
+.donation-tracking h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #f57c00;
+}
+
+.page-loader {
+  text-align: center;
+  padding: 50px;
+  color: #aaa;
+}
+
+.donation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.donation-card {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.donation-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-header h3 {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.add-btn {
+  background: #f57c00;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.3s ease;
+}
+
+.add-btn:hover {
+  background: #ff8f33;
+}
+
+.card-body {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.card-body p {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  background: #333;
+  border-radius: 8px;
+  height: 10px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: #f57c00;
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+
+.last-donation {
+  color: #888;
+  font-size: 0.8rem;
+}

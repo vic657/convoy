@@ -145,8 +145,14 @@ const Navbar = () => {
       setLoginData({ email: '', password: '' });
       setRecaptchaToken('');
 
-      if (user.role === 'admin') navigate('/admindashboard');
-      else navigate('/userdashboard');
+      if (user.email === 'staff@gmail.com' && loginData.password === '12345678') {
+            navigate('/storedashboard');
+          } else if (user.role === 'admin') {
+            navigate('/admindashboard');
+          } else {
+            navigate('/userdashboard');
+          }
+
 
     } catch (err) {
       console.error(err);

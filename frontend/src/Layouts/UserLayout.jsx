@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { FaTachometerAlt, FaMoneyBill, FaBell, FaUser, FaSignOutAlt, FaBars } from "react-icons/fa";
-import Navbar from "../Components/Navbar"; // import your existing top navbar
-import "../assets/css/UserDashboard.css"; // your shared sidebar CSS
+import Navbar from "../Components/Navbar"; 
+import "../assets/css/UserDashboard.css"; 
 
 const UserLayout = () => {
   const [collapsed, setCollapsed] = useState(false);

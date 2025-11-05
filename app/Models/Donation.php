@@ -23,6 +23,13 @@ class Donation extends Model
         'payment_method',
         'transaction_id',
         'message',
+        'type',
+    'status',
+    'item_name',
+    'quantity',
+    'unit',
+    'condition',
+    'remarks',
     ];
 
     protected $casts = [

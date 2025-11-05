@@ -16,6 +16,12 @@ import PaymentHistory from "./pages/PaymentHistory.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Profile from "./pages/Profile.jsx";
 
+// Store
+import StoreLayout from "./Layouts/StoreLayout.jsx";
+import StoreDashboard from "./pages/StoreDashboard.jsx";
+import DonationTracking from "./pages/DonationTracking.jsx"; 
+import NonCashDonations from "./pages/NonCashDonations.jsx";
+
 function App() {
   return (
     <Router>
@@ -41,7 +47,6 @@ function App() {
 
         {/* === User Layout with Nested Routes === */}
         <Route path="/dashboard" element={<UserLayout />}>
-          {/* Default redirect */}
           <Route index element={<Navigate to="/dashboard/home" replace />} />
           <Route path="home" element={<UserDashboard />} />
           <Route path="payments" element={<PaymentHistory />} />
@@ -51,10 +56,16 @@ function App() {
 
         {/* Redirect old user path */}
         <Route
-  path="/userdashboard/*"
-  element={<Navigate to="/dashboard/home" replace />}
-/>
+          path="/userdashboard/*"
+          element={<Navigate to="/dashboard/home" replace />}
+        />
 
+        {/* === Store Layout with Nested Routes === */}
+        <Route path="/storedashboard" element={<StoreLayout />}>
+          <Route index element={<StoreDashboard />} />
+          <Route path="donations" element={<DonationTracking />} />
+          <Route path="noncash" element={<NonCashDonations />} /> {/* 👈 Added route */}
+        </Route>
       </Routes>
     </Router>
   );
