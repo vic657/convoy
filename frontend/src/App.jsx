@@ -21,6 +21,8 @@ import StoreLayout from "./Layouts/StoreLayout.jsx";
 import StoreDashboard from "./pages/StoreDashboard.jsx";
 import DonationTracking from "./pages/DonationTracking.jsx"; 
 import NonCashDonations from "./pages/NonCashDonations.jsx";
+import BenefitedFamilies from "./pages/BenefitedFamilies";
+
 
 function App() {
   return (
@@ -64,7 +66,9 @@ function App() {
         <Route path="/storedashboard" element={<StoreLayout />}>
           <Route index element={<StoreDashboard />} />
           <Route path="donations" element={<DonationTracking />} />
-          <Route path="noncash" element={<NonCashDonations />} /> {/* 👈 Added route */}
+          <Route path="noncash" element={<NonCashDonations />} />
+          <Route path="/storedashboard/families" element={<BenefitedFamilies />} />
+
         </Route>
       </Routes>
     </Router>

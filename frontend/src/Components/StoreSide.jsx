@@ -7,6 +7,7 @@ import {
   FaChartLine,
   FaCog,
   FaSignOutAlt,
+  FaUsers,
 } from "react-icons/fa";
 
 const StoreSide = ({ sidebarOpen, setSidebarOpen }) => {
@@ -38,25 +39,38 @@ const StoreSide = ({ sidebarOpen, setSidebarOpen }) => {
               {sidebarOpen && <span>Dashboard</span>}
             </NavLink>
           </li>
+
           <li>
             <NavLink
-                to="/storedashboard/donations"
-                className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                <FaBoxOpen />
-                {sidebarOpen && <span>Donation Tracking</span>}
-                </NavLink>
-
+              to="/storedashboard/donations"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <FaBoxOpen />
+              {sidebarOpen && <span>Donation Tracking</span>}
+            </NavLink>
           </li>
+
           <li>
             <NavLink
               to="/storedashboard/noncash"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               <FaShoppingCart />
-              {sidebarOpen && <span>noncash donations</span>}
+              {sidebarOpen && <span>Noncash Donations</span>}
             </NavLink>
           </li>
+
+          {/* ✅ New Benefited Families Link */}
+          <li>
+            <NavLink
+              to="/storedashboard/families"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <FaUsers />
+              {sidebarOpen && <span>Benefited Families</span>}
+            </NavLink>
+          </li>
+
           <li>
             <NavLink
               to="/storedashboard/settings"

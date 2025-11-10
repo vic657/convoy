@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\BenefitedFamilyController;
 
 // ============================
 // TEST ROUTE
@@ -49,6 +50,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // Allow both admin and staff/storekeepers to mark received
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/donations/{id}/status', [DonationController::class, 'updateStatus']);
+     Route::get('/families', [BenefitedFamilyController::class, 'index']);
+    Route::post('/families', [BenefitedFamilyController::class, 'store']);
 });
 
 

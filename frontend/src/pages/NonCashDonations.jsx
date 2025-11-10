@@ -25,14 +25,15 @@ const NonCashDonations = () => {
   const fetchDonations = async () => {
     try {
       const res = await apiAxios.get("/donations");
-      const items = res.data.donations.filter((d) => d.type !== "money");
+      const items = res.data.donations
+  .filter((d) => d.type !== "money")
+  .map((d) => ({
+    ...d,
+    status: d.status, // use status as it is from backend
+  }));
 
-      const cleaned = items.map((d) => ({
-        ...d,
-        status: d.status || "pending",
-      }));
+setDonations(items);
 
-      setDonations(cleaned);
     } catch (err) {
       console.error("Failed to load donations:", err);
     } finally {

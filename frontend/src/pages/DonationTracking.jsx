@@ -1,26 +1,52 @@
 import React, { useEffect, useState } from "react";
-import { apiAxios } from "../axios"; // ✅ use your configured instance
+import { apiAxios } from "../axios";
 import "../assets/css/donationtracking.css";
 import { FaPlusCircle, FaMoneyBillWave, FaChartPie } from "react-icons/fa";
 
 const DonationTracking = () => {
   const [loading, setLoading] = useState(true);
-  const [donations, setDonations] = useState([]);
+  const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchDonations = async () => {
       try {
         const response = await apiAxios.get("/donations");
+
         if (response.data && response.data.success) {
-          const formatted = response.data.donations.map((d) => ({
-            id: d.id,
-            event: d.event?.title || "Unnamed Event",
-            target: d.event?.target_amount || 0, // ensure backend includes target_amount in Event
-            received: d.amount || 0,
-            lastDonation: d.created_at,
-          }));
-          setDonations(formatted);
+          const donations = response.data.donations;
+
+          // 🧩 Group donations by event
+          const grouped = donations.reduce((acc, d) => {
+            const eventId = d.event?.id || "unknown";
+            if (!acc[eventId]) {
+              acc[eventId] = {
+                id: eventId,
+                title: d.event?.title || "Unnamed Event",
+                target: Number(d.event?.target_amount || 0),
+                totalReceived: 0,
+                lastDonation: d.created_at,
+                nonCash: 0,
+              };
+            }
+
+            // 🧮 Add money or non-cash donation count/value
+            if (d.type === "money") {
+              acc[eventId].totalReceived += Number(d.amount || 0);
+            } else {
+              // Count or treat non-cash as number of items received
+              acc[eventId].nonCash += 1;
+            }
+
+            // Update latest donation date if newer
+            if (new Date(d.created_at) > new Date(acc[eventId].lastDonation)) {
+              acc[eventId].lastDonation = d.created_at;
+            }
+
+            return acc;
+          }, {});
+
+          setEvents(Object.values(grouped));
         } else {
           setError("No donations found.");
         }
@@ -35,9 +61,7 @@ const DonationTracking = () => {
     fetchDonations();
   }, []);
 
-  if (loading)
-    return <div className="page-loader">Loading donation data...</div>;
-
+  if (loading) return <div className="page-loader">Loading donation data...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
@@ -45,15 +69,15 @@ const DonationTracking = () => {
       <h2>Donation Tracking</h2>
 
       <div className="donation-grid">
-        {donations.map((donation) => {
-          const progress = donation.target
-            ? Math.round((donation.received / donation.target) * 100)
+        {events.map((event) => {
+          const progress = event.target
+            ? Math.min(Math.round((event.totalReceived / event.target) * 100), 100)
             : 0;
 
           return (
-            <div className="donation-card" key={donation.id}>
+            <div className="donation-card" key={event.id}>
               <div className="card-header">
-                <h3>{donation.event}</h3>
+                <h3>{event.title}</h3>
                 <button className="add-btn">
                   <FaPlusCircle /> Add Donation
                 </button>
@@ -61,12 +85,16 @@ const DonationTracking = () => {
 
               <div className="card-body">
                 <p>
-                  <FaMoneyBillWave /> Received:{" "}
-                  <strong>Ksh {donation.received.toLocaleString()}</strong>
+                  <FaMoneyBillWave /> Total Cash Received:{" "}
+                  <strong>Ksh {event.totalReceived.toLocaleString()}</strong>
+                </p>
+                <p>
+                  🧺 Non-cash Donations:{" "}
+                  <strong>{event.nonCash}</strong>
                 </p>
                 <p>
                   <FaChartPie /> Target:{" "}
-                  <strong>Ksh {donation.target.toLocaleString()}</strong>
+                  <strong>Ksh {event.target.toLocaleString()}</strong>
                 </p>
 
                 <div className="progress-bar">
@@ -78,7 +106,7 @@ const DonationTracking = () => {
 
                 <small>Progress: {progress}%</small>
                 <p className="last-donation">
-                  Last donation: {donation.lastDonation}
+                  Last donation: {new Date(event.lastDonation).toLocaleString()}
                 </p>
               </div>
             </div>

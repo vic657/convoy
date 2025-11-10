@@ -73,6 +73,12 @@ class DonationController extends Controller
             'contact' => $d->contact,
             'payment_method' => $d->payment_method,
             'message' => $d->message,
+            'status' => $d->status, // ✅ include status here
+            'item_name' => $d->item_name,
+            'quantity' => $d->quantity,
+            'unit' => $d->unit,
+            'condition' => $d->condition,
+            'remarks' => $d->remarks,
             'event' => [
                 'id' => $d->event?->id,
                 'title' => $d->event?->title,
@@ -88,6 +94,7 @@ class DonationController extends Controller
         'donations' => $donations
     ]);
 }
+
 
 
     // ==========================

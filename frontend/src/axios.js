@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -6,8 +6,8 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 export const authAxios = axios.create({
   baseURL: `${API_BASE}/v1/auth`,
   headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
@@ -15,14 +15,24 @@ export const authAxios = axios.create({
 export const apiAxios = axios.create({
   baseURL: API_BASE,
   headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
-// Add token automatically if present
-const token = localStorage.getItem('auth_token');
-if (token) {
-  authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  apiAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-}
+// ✅ Always attach latest token before every request
+apiAxios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("auth_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+authAxios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("auth_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
