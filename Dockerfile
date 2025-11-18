@@ -1,31 +1,45 @@
-# Stage 1: Build
-FROM composer:2.6 AS build
-WORKDIR /app
-COPY . .                         # Copy all files first!
-RUN composer install --no-dev --optimize-autoloader
-
-# Stage 2: Runtime
+# Use official PHP with Apache
 FROM php:8.2-apache
+
 WORKDIR /var/www/html
 
-# Install PHP extensions
-RUN apt-get update && apt-get install -y zip unzip libpng-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo_mysql mbstring gd \
-    && a2enmod rewrite \
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git unzip libpng-dev libjpeg-dev libfreetype6-dev \
+    libonig-dev libxml2-dev zip curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql gd mbstring exif pcntl bcmath opcache \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy app from build
-COPY --from=build /app /var/www/html
+# Enable Apache rewrite
+RUN a2enmod rewrite
 
-# Fix permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Install Composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Apache public directory
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+# Copy Laravel files
+COPY . .
 
-# Entrypoint
+# Install PHP deps
+RUN composer install --optimize-autoloader --no-dev
+
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+# Configure Apache to use Laravel's public dir
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf \
+    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/sites-available/000-default.conf \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Run storage link during build
+RUN php artisan storage:link || true
+
+# Render requires exposing the same port it assigns ($PORT)
+EXPOSE 10000
+
+# Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 10000
 ENTRYPOINT ["/entrypoint.sh"]

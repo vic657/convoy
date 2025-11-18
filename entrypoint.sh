@@ -3,18 +3,16 @@ set -e
 
 echo "🚀 Starting Laravel on Render..."
 
-# Storage link
-php artisan storage:link || true
-
-# Run package discover (important since we skipped it in build)
-php artisan package:discover --ansi
-
-# Run migrations
-php artisan migrate --force || echo "⚠️ Migration skipped"
-
 # Clear caches
-php artisan config:cache || true
-php artisan route:cache || true
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+# Run migrations but don't block startup if DB isn't ready
+echo "⚡ Running migrations..."
+php artisan migrate --force || echo "⚠️ Migration skipped (DB not ready)."
 
 # Start Apache
+echo "🌍 Starting Apache..."
 exec apache2-foreground
