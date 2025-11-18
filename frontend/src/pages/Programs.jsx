@@ -49,7 +49,8 @@ const Programs = () => {
     try {
       setLoading(true);
       const res = await apiAxios.get("/events");
-      setEvents(res.data || []);
+      setEvents(res.data.events || []);
+
     } catch (err) {
       console.error("Error fetching events:", err);
       toast.error("Failed to load events.");

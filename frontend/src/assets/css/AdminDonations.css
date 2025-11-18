@@ -1,0 +1,72 @@
+.admin-donations-container {
+  padding: 20px;
+}
+
+.admin-donations-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.donations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-card h3 {
+  margin-bottom: 10px;
+  color: #ff6a00;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress {
+  height: 10px;
+  background: #ff6a00;
+  transition: width 0.3s ease;
+}
+
+.view-btn {
+  background: #ff6a00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.view-btn:hover {
+  background: #e05c00;
+}
+
+.details-section {
+  margin-top: 40px;
+}
+
+.details-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.details-grid .card {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}

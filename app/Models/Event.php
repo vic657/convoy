@@ -26,4 +26,9 @@ class Event extends Model
     {
         return $this->image ? url('storage/' . $this->image) : null;
     }
+    public function donations()
+{
+    return $this->hasMany(Donation::class, 'event_id');
+}
+
 }

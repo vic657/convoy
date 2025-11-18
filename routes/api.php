@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\BenefitedFamilyController;
+use App\Http\Controllers\AdminDonationController;
 
 // ============================
 // TEST ROUTE
@@ -41,6 +42,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     // Staff
     Route::get('/staff', [AdminController::class, 'getStaff']);
+    //donation info
+       Route::get('/admin/donations-summary', [AdminDonationController::class, 'summary']);
+    Route::get('/admin/events/{event}/donors', [AdminDonationController::class, 'eventDonors']);
+    Route::get('/admin/events/{event}/beneficiaries', [AdminDonationController::class, 'eventBeneficiaries']);
    
 
 

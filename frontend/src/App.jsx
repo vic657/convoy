@@ -8,6 +8,7 @@ import Users from "./pages/Users.jsx";
 import Programs from "./pages/Programs.jsx";
 import Reports from "./pages/Reports.jsx";
 import Settings from "./pages/Settings.jsx";
+import AdminDonations from "./pages/AdminDonations.jsx";
 
 // User
 import UserLayout from "./Layouts/UserLayout.jsx";
@@ -37,6 +38,8 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="programs" element={<Programs />} />
+          <Route path="donations" element={<AdminDonations />} />
+
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
         </Route>
