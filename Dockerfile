@@ -1,45 +1,36 @@
-# Use official PHP with Apache
+# ---- Stage 1: Build ----
+FROM composer:2.6 AS build
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader
+
+COPY . .
+
+# ---- Stage 2: Runtime ----
 FROM php:8.2-apache
 
 WORKDIR /var/www/html
 
-# Install dependencies
+# Install PHP extensions
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libxml2-dev zip curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd mbstring exif pcntl bcmath opcache \
+    zip unzip libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo_mysql mbstring gd \
+    && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache rewrite
-RUN a2enmod rewrite
+# Copy app + dependencies
+COPY --from=build /app /var/www/html
 
-# Install Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+# Fix permissions
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Copy Laravel files
-COPY . .
-
-# Install PHP deps
-RUN composer install --optimize-autoloader --no-dev
-
-# Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
-# Configure Apache to use Laravel's public dir
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf \
-    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/sites-available/000-default.conf \
-    && echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Run storage link during build
-RUN php artisan storage:link || true
-
-# Render requires exposing the same port it assigns ($PORT)
-EXPOSE 10000
+# Apache public directory
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+EXPOSE 10000
 ENTRYPOINT ["/entrypoint.sh"]
