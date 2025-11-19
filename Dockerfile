@@ -20,8 +20,13 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Copy Laravel files
 COPY . .
 
-# Install PHP deps
-RUN composer install --optimize-autoloader --no-dev
+# Install PHP deps (including Sanctum)
+RUN composer install --optimize-autoloader --no-dev \
+    && composer require laravel/sanctum
+
+# Publish Sanctum config + migrations
+RUN php artisan vendor:publish --provider="Laravel\\Sanctum\\SanctumServiceProvider" --force \
+    && php artisan migrate --force || true
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
