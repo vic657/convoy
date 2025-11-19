@@ -14,7 +14,6 @@ import AdminDonations from "./pages/AdminDonations.jsx";
 import UserLayout from "./Layouts/UserLayout.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx";
-import Notifications from "./pages/Notifications.jsx";
 import Profile from "./pages/Profile.jsx";
 
 // Store
