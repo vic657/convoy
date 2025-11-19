@@ -24,21 +24,10 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev \
     && composer require laravel/sanctum
 
-# Publish Sanctum config + migrations
-RUN php artisan vendor:publish --provider="Laravel\\Sanctum\\SanctumServiceProvider" --force \
-    && php artisan migrate --force || true
-
-# Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
 # Configure Apache to use Laravel's public dir
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf \
     && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/sites-available/000-default.conf \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Run storage link during build
-RUN php artisan storage:link || true
 
 # Render requires exposing the same port it assigns ($PORT)
 EXPOSE 10000
