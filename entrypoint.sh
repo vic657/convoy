@@ -12,7 +12,7 @@ php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 
-# Run migrations safely
+# Run migrations 
 echo "⚡ Running migrations..."
 php artisan migrate --force || echo "⚠️ Migration skipped (DB not ready)."
 
