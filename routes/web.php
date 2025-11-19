@@ -1,6 +1,7 @@
 <?php
 
-// routes/web.php
+use Illuminate\Support\Facades\Route;
+
 Route::get('/{any}', function () {
-    return view('index');
-})->where('any', '^(?!api).*$');  // exclude API routes
+    return file_get_contents(public_path('index.html'));
+})->where('any', '^(?!api).*$');
