@@ -54,7 +54,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard/home" replace />} />
           <Route path="home" element={<UserDashboard />} />
           <Route path="payments" element={<PaymentHistory />} />
-          <Route path="notifications" element={<Notifications />} />
+          
           <Route path="profile" element={<Profile />} />
         </Route>
 
