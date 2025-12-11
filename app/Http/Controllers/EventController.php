@@ -31,6 +31,10 @@ class EventController extends Controller
                 $event->progress = $event->target_amount > 0
                     ? round(($totalDonations / $event->target_amount) * 100, 2)
                     : 0;
+
+                // Return clean ImageKit URL
+                $event->image_url = $event->image;
+
                 return $event;
             });
 
@@ -43,6 +47,10 @@ class EventController extends Controller
                 $event->progress = $event->target_amount > 0
                     ? round(($totalDonations / $event->target_amount) * 100, 2)
                     : 0;
+
+                // Return clean ImageKit URL
+                $event->image_url = $event->image;
+
                 return $event;
             });
 
@@ -66,15 +74,19 @@ class EventController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
+
             $upload = $this->imageKit->upload([
                 'file' => fopen($file->getRealPath(), 'r'),
-                'fileName' => $file->getClientOriginalName(),
+                'fileName' => time() . '_' . $file->getClientOriginalName(),
                 'folder' => '/events'
             ]);
+
+            // Store ImageKit URL ONLY
             $validated['image'] = $upload->result->url;
         }
 
         $event = Event::create($validated);
+        $event->image_url = $event->image;
 
         return response()->json([
             'message' => 'Event created successfully',
@@ -95,17 +107,20 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Optionally delete old image from ImageKit using its fileId if you store it
             $file = $request->file('image');
+
             $upload = $this->imageKit->upload([
                 'file' => fopen($file->getRealPath(), 'r'),
-                'fileName' => $file->getClientOriginalName(),
+                'fileName' => time() . '_' . $file->getClientOriginalName(),
                 'folder' => '/events'
             ]);
+
+            // Store ImageKit URL ONLY
             $validated['image'] = $upload->result->url;
         }
 
         $event->update($validated);
+        $event->image_url = $event->image;
 
         return response()->json([
             'message' => 'Event updated successfully',
@@ -115,7 +130,6 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        // Optionally delete image from ImageKit here if you store fileId
         $event->delete();
 
         return response()->json(['message' => 'Event deleted successfully']);
