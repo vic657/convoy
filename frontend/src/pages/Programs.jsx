@@ -234,7 +234,7 @@ const Programs = () => {
           {filteredEvents.length > 0 ? (
             filteredEvents.map((event) => (
               <div key={event.id} className="event-card">
-                {event.image_url && (
+                {event.image && (
                   <img
                     src={event.image}
                     alt={event.title}
