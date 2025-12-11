@@ -4,43 +4,53 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Donation;
+use ImageKit\ImageKit;
 
 class EventController extends Controller
 {
+    protected $imageKit;
+
+    public function __construct()
+    {
+        $this->imageKit = new ImageKit(
+            env('IMAGEKIT_PUBLIC_KEY'),
+            env('IMAGEKIT_PRIVATE_KEY'),
+            env('IMAGEKIT_URL_ENDPOINT')
+        );
+    }
+
     public function index()
-{
-    $upcoming = Event::where('date', '>=', now())
-        ->orderBy('date', 'asc')
-        ->get()
-        ->map(function ($event) {
-            $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
-            $event->total_donations = $totalDonations;
-            $event->progress = $event->target_amount > 0
-                ? round(($totalDonations / $event->target_amount) * 100, 2)
-                : 0;
-            return $event;
-        });
+    {
+        $upcoming = Event::where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($event) {
+                $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
+                $event->total_donations = $totalDonations;
+                $event->progress = $event->target_amount > 0
+                    ? round(($totalDonations / $event->target_amount) * 100, 2)
+                    : 0;
+                return $event;
+            });
 
-    $past = Event::where('date', '<', now())
-        ->orderBy('date', 'desc')
-        ->get()
-        ->map(function ($event) {
-            $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
-            $event->total_donations = $totalDonations;
-            $event->progress = $event->target_amount > 0
-                ? round(($totalDonations / $event->target_amount) * 100, 2)
-                : 0;
-            return $event;
-        });
+        $past = Event::where('date', '<', now())
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($event) {
+                $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
+                $event->total_donations = $totalDonations;
+                $event->progress = $event->target_amount > 0
+                    ? round(($totalDonations / $event->target_amount) * 100, 2)
+                    : 0;
+                return $event;
+            });
 
-    return response()->json([
-        'upcoming' => $upcoming,
-        'past' => $past,
-    ]);
-}
-
+        return response()->json([
+            'upcoming' => $upcoming,
+            'past' => $past,
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -55,8 +65,13 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('events', 'public');
-            $validated['image'] = $path;
+            $file = $request->file('image');
+            $upload = $this->imageKit->upload([
+                'file' => fopen($file->getRealPath(), 'r'),
+                'fileName' => $file->getClientOriginalName(),
+                'folder' => '/events'
+            ]);
+            $validated['image'] = $upload->result->url;
         }
 
         $event = Event::create($validated);
@@ -80,11 +95,14 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($event->image && Storage::disk('public')->exists($event->image)) {
-                Storage::disk('public')->delete($event->image);
-            }
-            $path = $request->file('image')->store('events', 'public');
-            $validated['image'] = $path;
+            // Optionally delete old image from ImageKit using its fileId if you store it
+            $file = $request->file('image');
+            $upload = $this->imageKit->upload([
+                'file' => fopen($file->getRealPath(), 'r'),
+                'fileName' => $file->getClientOriginalName(),
+                'folder' => '/events'
+            ]);
+            $validated['image'] = $upload->result->url;
         }
 
         $event->update($validated);
@@ -97,14 +115,9 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        if ($event->image && Storage::disk('public')->exists($event->image)) {
-            Storage::disk('public')->delete($event->image);
-        }
-
+        // Optionally delete image from ImageKit here if you store fileId
         $event->delete();
 
         return response()->json(['message' => 'Event deleted successfully']);
     }
-    
 }
-

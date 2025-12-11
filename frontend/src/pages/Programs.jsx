@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiAxios } from "../axios";
 
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../assets/css/programs.css";
@@ -11,7 +10,6 @@ import {
   FaTrash,
   FaEdit,
   FaCalendarAlt,
-  FaBell,
 } from "react-icons/fa";
 
 const Programs = () => {
@@ -21,10 +19,7 @@ const Programs = () => {
   const [showForm, setShowForm] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [expandedEventId, setExpandedEventId] = useState(null);
-
 
   const [formData, setFormData] = useState({
     title: "",
@@ -38,11 +33,6 @@ const Programs = () => {
 
   useEffect(() => {
     fetchEvents();
-    fetchNotifications();
-
-    // Simulate live updates every 15s (later can be WebSocket)
-    const interval = setInterval(fetchNotifications, 15000);
-    return () => clearInterval(interval);
   }, []);
 
   const fetchEvents = async () => {
@@ -50,21 +40,11 @@ const Programs = () => {
       setLoading(true);
       const res = await apiAxios.get("/events");
       setEvents(res.data.events || []);
-
     } catch (err) {
       console.error("Error fetching events:", err);
       toast.error("Failed to load events.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchNotifications = async () => {
-    try {
-      const res = await apiAxios.get("/event-notifications");
-      setNotifications(res.data || []);
-    } catch (err) {
-      console.error("Error fetching notifications:", err);
     }
   };
 
@@ -101,16 +81,14 @@ const Programs = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setFormData({
-            title: "",
-            date: "",
-            venue: "",
-            target_amount: "",
-            audience: "",
-            description: "",
-            image: null,
-            });
-
-
+          title: "",
+          date: "",
+          venue: "",
+          target_amount: "",
+          audience: "",
+          description: "",
+          image: null,
+        });
       }
 
       setShowForm(false);
@@ -123,53 +101,59 @@ const Programs = () => {
   };
 
   const handleDelete = async (id) => {
-  toast.info(
-    <div>
-      <p>Are you sure you want to delete this event?</p>
-      <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
-        <button
-          onClick={async () => {
-            try {
-              await apiAxios.delete(`/events/${id}`);
-              setEvents(events.filter((e) => e.id !== id));
-              toast.dismiss();
-              toast.success("Event deleted successfully!");
-            } catch (err) {
-              console.error("Error deleting event:", err);
-              toast.dismiss();
-              toast.error("Failed to delete event.");
-            }
-          }}
+    toast.info(
+      <div>
+        <p>Are you sure you want to delete this event?</p>
+        <div
           style={{
-            background: "red",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            padding: "5px 10px",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            marginTop: "10px",
           }}
         >
-          Yes
-        </button>
-        <button
-          onClick={() => toast.dismiss()}
-          style={{
-            background: "#999",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            padding: "5px 10px",
-            cursor: "pointer",
-          }}
-        >
-          No
-        </button>
-      </div>
-    </div>,
-    { autoClose: false, closeOnClick: false }
-  );
-};
-
+          <button
+            onClick={async () => {
+              try {
+                await apiAxios.delete(`/events/${id}`);
+                setEvents(events.filter((e) => e.id !== id));
+                toast.dismiss();
+                toast.success("Event deleted successfully!");
+              } catch (err) {
+                console.error("Error deleting event:", err);
+                toast.dismiss();
+                toast.error("Failed to delete event.");
+              }
+            }}
+            style={{
+              background: "red",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "5px 10px",
+              cursor: "pointer",
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            style={{
+              background: "#999",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "5px 10px",
+              cursor: "pointer",
+            }}
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false }
+    );
+  };
 
   const handleEdit = (event) => {
     setEditEvent(event);
@@ -201,44 +185,12 @@ const Programs = () => {
         <h2>Programs & Events</h2>
 
         <div className="header-actions">
-          {/* Notification Bell */}
-          <div className="notification-container">
-            <button
-              className="notif-btn"
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
-              <FaBell />
-              {notifications.length > 0 && (
-                <span className="notif-badge">{notifications.length}</span>
-              )}
-            </button>
-
-            {showNotifications && (
-              <div className="notif-dropdown">
-                <h4>Recent Contributions</h4>
-                {notifications.length > 0 ? (
-                  notifications.map((n, i) => (
-                    <div key={i} className="notif-item">
-                      <p>
-                        <strong>{n.user_name}</strong> contributed to{" "}
-                        <span>{n.event_title}</span>
-                      </p>
-                      <small>{n.created_at}</small>
-                    </div>
-                  ))
-                ) : (
-                  <p className="no-notif">No new contributions</p>
-                )}
-              </div>
-            )}
-          </div>
-
           {/* Add Event Button */}
           <button
             className="add-btn"
             onClick={() => {
-                setEditEvent(null);
-                setFormData({
+              setEditEvent(null);
+              setFormData({
                 title: "",
                 date: "",
                 venue: "",
@@ -246,11 +198,10 @@ const Programs = () => {
                 audience: "",
                 description: "",
                 image: null,
-                });
-                setShowForm(true);
+              });
+              setShowForm(true);
             }}
-            >
-
+          >
             <FaPlus /> Add Event
           </button>
         </div>
@@ -285,7 +236,7 @@ const Programs = () => {
               <div key={event.id} className="event-card">
                 {event.image_url && (
                   <img
-                    src={event.image_url}
+                    src={event.image}
                     alt={event.title}
                     className="event-image"
                   />
@@ -305,20 +256,20 @@ const Programs = () => {
                     <strong>Audience:</strong> {event.audience}
                   </p>
                   <p
-                    className={`desc ${expandedEventId === event.id ? "expanded" : ""}`}
+                    className={`desc ${
+                      expandedEventId === event.id ? "expanded" : ""
+                    }`}
                     onClick={() =>
-                        setExpandedEventId(expandedEventId === event.id ? null : event.id)
+                      setExpandedEventId(
+                        expandedEventId === event.id ? null : event.id
+                      )
                     }
-                    >
+                  >
                     {event.description}
-                    </p>
-
+                  </p>
                 </div>
                 <div className="event-actions">
-                  <button
-                    onClick={() => handleEdit(event)}
-                    className="edit-btn"
-                  >
+                  <button onClick={() => handleEdit(event)} className="edit-btn">
                     <FaEdit /> Edit
                   </button>
                   <button
@@ -337,83 +288,81 @@ const Programs = () => {
       )}
 
       {showForm && (
-  <div className="event-form">
-    <h3>{editEvent ? "Edit Event" : "Add New Event"}</h3>
-    <form onSubmit={handleSave}>
-      <input
-        type="text"
-        name="title"
-        placeholder="Event Title"
-        value={formData.title}
-        onChange={handleInputChange}
-        required
-      />
+        <div className="event-form">
+          <h3>{editEvent ? "Edit Event" : "Add New Event"}</h3>
+          <form onSubmit={handleSave}>
+            <input
+              type="text"
+              name="title"
+              placeholder="Event Title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+            />
 
-      {/* Prevent past dates */}
-      <input
-        type="date"
-        name="date"
-        value={formData.date}
-        onChange={handleInputChange}
-        min={new Date().toISOString().split("T")[0]} // this sets today as minimum date
-        required
-      />
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              min={new Date().toISOString().split("T")[0]}
+              required
+            />
 
-      <input
-        type="text"
-        name="venue"
-        placeholder="Venue"
-        value={formData.venue}
-        onChange={handleInputChange}
-        required
-      />
-      <input
-        type="number"
-        name="target_amount"
-        placeholder="Target Amount"
-        value={formData.target_amount}
-        onChange={handleInputChange}
-      />
-      <input
-        type="text"
-        name="audience"
-        placeholder="Target beneficiaries (families)"
-        value={formData.audience}
-        onChange={handleInputChange}
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={formData.description}
-        onChange={handleInputChange}
-        rows={4}
-      ></textarea>
-      <input
-        type="file"
-        name="image"
-        accept="image/*"
-        onChange={handleInputChange}
-      />
+            <input
+              type="text"
+              name="venue"
+              placeholder="Venue"
+              value={formData.venue}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              type="number"
+              name="target_amount"
+              placeholder="Target Amount"
+              value={formData.target_amount}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="audience"
+              placeholder="Target beneficiaries (families)"
+              value={formData.audience}
+              onChange={handleInputChange}
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={4}
+            ></textarea>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleInputChange}
+            />
 
-      <div className="form-actions">
-        <button type="submit" className="save-btn">
-          {editEvent ? "Update" : "Save"}
-        </button>
-        <button
-          type="button"
-          className="cancel-btn"
-          onClick={() => {
-            setShowForm(false);
-            setEditEvent(null);
-          }}
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
-)}
-
+            <div className="form-actions">
+              <button type="submit" className="save-btn">
+                {editEvent ? "Update" : "Save"}
+              </button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditEvent(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

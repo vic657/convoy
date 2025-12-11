@@ -45,11 +45,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <FaChartLine /> {sidebarOpen && <span>Reports</span>}
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/admin/reports">
-              <FaBell /> {sidebarOpen && <span>Notifications</span>}
-            </NavLink>
-          </li>
+          
           <li>
             <NavLink to="/admin/settings">
               <FaCog /> {sidebarOpen && <span>Settings</span>}
