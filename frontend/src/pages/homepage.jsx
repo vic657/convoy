@@ -123,9 +123,11 @@ const Homepage = () => {
             className={`event-slide ${index === activeIndex ? "active" : ""}`}
           >
             <img
-              src={`http://127.0.0.1:8000/storage/${event.image.replace(/^storage\//, "")}`}
+              src={event.image_url}
               alt={event.title}
+              className="event-slide-image"
             />
+
             <div className="overlay">
               <div className="event-info">
                 <h3>{event.title}</h3>
