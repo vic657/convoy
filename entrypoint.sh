@@ -16,17 +16,22 @@ touch /var/www/html/storage/logs/laravel.log
 chown www-data:www-data /var/www/html/storage/logs/laravel.log
 chmod 664 /var/www/html/storage/logs/laravel.log
 
-# Clear caches
+# Clear Laravel caches
+echo "🧹 Clearing Laravel caches..."
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 
-# Run storage link
+# 🔥 Clear OPcache to make sure new PHP code is loaded
+echo "🧨 Resetting PHP OPcache..."
+php -r "if (function_exists('opcache_reset')) { opcache_reset(); echo 'OPcache cleared.'; } else { echo 'OPcache not enabled.'; }"
+
+# Create storage link
 echo "🔗 Creating storage symlink..."
 php artisan storage:link || true
 
-# Run migrations 
+# Run migrations
 echo "⚡ Running migrations..."
 php artisan migrate --force || echo "⚠️ Migration skipped (DB not ready)."
 
