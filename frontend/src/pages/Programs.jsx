@@ -136,127 +136,116 @@ const Programs = () => {
       <ToastContainer />
 
       {/* ===== HERO SLIDER ===== */}
-      <section id="events-hero">
-        <div className="events-container">
-          <h2>Upcoming Events</h2>
+<section id="events-hero">
+  <div className="events-container">
+    <h2>Upcoming Events</h2>
 
-          <div className="event-slider">
-            {upcoming.length > 0 ? (
-              upcoming.map((event, index) => (
-                <div
-                  key={event.id}
-                  className={`event-slide ${
-                    index === activeIndex ? "active" : ""
-                  }`}
-                >
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="event-slide-image"
-                  />
+    <div className="event-slider">
+      {upcoming.length > 0 ? (
+        upcoming.map((event, index) => (
+          <div
+            key={event.id}
+            className={`event-slide ${index === activeIndex ? "active" : ""}`}
+          >
+            <img
+              src={event.image_url}
+              alt={event.title}
+              className="event-slide-image"
+            />
 
-                  <div className="overlay">
-                    <div className="event-info">
-                      <h3>{event.title}</h3>
-                      <p>
-                        {event.date} • {event.venue}
-                      </p>
-                      <p className="desc">
-                        {event.description?.length > 150
-                          ? event.description.slice(0, 150) + "..."
-                          : event.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-events">No upcoming events yet.</div>
-            )}
-
-            {upcoming.length > 1 && (
-              <>
-                <button className="nav-btn prev" onClick={prevSlide}>
-                  ‹
-                </button>
-                <button className="nav-btn next" onClick={nextSlide}>
-                  ›
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FILTERS ===== */}
-      <div className="search-filter">
-        <div className="search-box">
-          <FaSearch className="icon" />
-          <input
-            type="text"
-            placeholder="Search by title or venue..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="filter-box">
-          <FaCalendarAlt className="icon" />
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* === TOGGLE UPCOMING / PAST === */}
-      <div className="toggle-container">
-        <button
-          className={showUpcoming ? "active-toggle" : ""}
-          onClick={() => setShowUpcoming(true)}
-        >
-          Upcoming Events
-        </button>
-        <button
-          className={!showUpcoming ? "active-toggle" : ""}
-          onClick={() => setShowUpcoming(false)}
-        >
-          Past Events
-        </button>
-      </div>
-
-      {/* === EVENTS LIST === */}
-      <div className="events-grid">
-        {filtered.length > 0 ? (
-          filtered.map((event) => (
-            <div key={event.id} className="event-card">
-              <img src={event.image} className="event-image" />
-
-              <div className="event-content">
+            <div className="overlay">
+              <div className="event-info">
                 <h3>{event.title}</h3>
-                <p>
-                  <strong>Date:</strong> {event.date}
+                <p>{event.date} • {event.venue}</p>
+                <p className="desc">
+                  {event.description?.length > 150
+                    ? event.description.slice(0, 150) + "..."
+                    : event.description}
                 </p>
-                <p>
-                  <strong>Venue:</strong> {event.venue}
-                </p>
-              </div>
-
-              <div className="event-actions">
-                <button onClick={() => handleDelete(event.id)}>
-                  <FaTrash /> Delete
-                </button>
-                <button onClick={() => setEditEvent(event)}>
-                  <FaEdit /> Edit
-                </button>
               </div>
             </div>
-          ))
-        ) : (
-          <p className="no-events">No events found.</p>
-        )}
+          </div>
+        ))
+      ) : (
+        <div className="no-events">No upcoming events yet.</div>
+      )}
+
+      {upcoming.length > 1 && (
+        <>
+          <button className="nav-btn prev" onClick={prevSlide}>‹</button>
+          <button className="nav-btn next" onClick={nextSlide}>›</button>
+        </>
+      )}
+    </div>
+  </div>
+</section>
+
+{/* ===== FILTERS ===== */}
+<div className="search-filter">
+  <div className="search-box">
+    <FaSearch className="icon" />
+    <input
+      type="text"
+      placeholder="Search by title or venue..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  </div>
+
+  <div className="filter-box">
+    <FaCalendarAlt className="icon" />
+    <input
+      type="date"
+      value={filterDate}
+      onChange={(e) => setFilterDate(e.target.value)}
+    />
+  </div>
+</div>
+
+{/* === TOGGLE UPCOMING / PAST === */}
+<div className="toggle-container">
+  <button
+    className={showUpcoming ? "active-toggle" : ""}
+    onClick={() => setShowUpcoming(true)}
+  >
+    Upcoming Events
+  </button>
+  <button
+    className={!showUpcoming ? "active-toggle" : ""}
+    onClick={() => setShowUpcoming(false)}
+  >
+    Past Events
+  </button>
+</div>
+
+{/* === EVENTS LIST === */}
+<div className="events-grid">
+  {filtered.length > 0 ? (
+    filtered.map((event) => (
+      <div key={event.id} className="event-card">
+        <img src={event.image_url} className="event-image" />
+
+        <div className="event-content">
+          <h3>{event.title}</h3>
+          <p><strong>Date:</strong> {event.date}</p>
+          <p><strong>Venue:</strong> {event.venue}</p>
+        </div>
+
+        <div className="event-actions">
+          <button onClick={() => handleDelete(event.id)}>
+            <FaTrash /> Delete
+          </button>
+          <button onClick={() => setEditEvent(event)}>
+            <FaEdit /> Edit
+          </button>
+        </div>
       </div>
+    ))
+  ) : (
+    <p className="no-events">No events found.</p>
+  )}
+</div>
+
 
       {/* === FORM (Add/Edit) === */}
       {showForm && (
