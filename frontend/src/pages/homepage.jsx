@@ -123,7 +123,7 @@ const Homepage = () => {
             className={`event-slide ${index === activeIndex ? "active" : ""}`}
           >
             <img
-              src={event.image_url || event.image}
+              src={event.image}
               alt={event.title}
               className="event-slide-image"
             />
