@@ -14,12 +14,17 @@ import {
 
 const Programs = () => {
   const [events, setEvents] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [past, setPast] = useState([]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [expandedEventId, setExpandedEventId] = useState(null);
+
+  const [showUpcoming, setShowUpcoming] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -39,31 +44,48 @@ const Programs = () => {
     try {
       setLoading(true);
       const res = await apiAxios.get("/events");
-      setEvents(res.data.events || []);
+
+      setUpcoming(res.data.upcoming || []);
+      setPast(res.data.past || []);
+
+      setEvents([
+        ...(res.data.upcoming || []),
+        ...(res.data.past || []),
+      ]);
     } catch (err) {
-      console.error("Error fetching events:", err);
-      toast.error("Failed to load events.");
+      console.error("Error:", err);
+      toast.error("Failed to load events");
     } finally {
       setLoading(false);
     }
   };
 
+  // === Slider auto change ===
+  useEffect(() => {
+    if (upcoming.length === 0) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % upcoming.length);
+    }, 4000);
+
+    return () => clearInterval(timer);
+  }, [upcoming]);
+
+  const prevSlide = () =>
+    setActiveIndex((prev) => (prev - 1 + upcoming.length) % upcoming.length);
+  const nextSlide = () =>
+    setActiveIndex((prev) => (prev + 1) % upcoming.length);
+
+  // === Form Handling ===
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-
-    if (!formData.title || !formData.date || !formData.venue) {
-      toast.warn("Please fill all required fields!");
-      return;
-    }
 
     const payload = new FormData();
     for (const key in formData) {
@@ -72,141 +94,101 @@ const Programs = () => {
 
     try {
       if (editEvent) {
-        await apiAxios.post(`/events/${editEvent.id}?_method=PUT`, payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await apiAxios.post(`/events/${editEvent.id}?_method=PUT`, payload);
         toast.success("Event updated successfully!");
       } else {
-        await apiAxios.post("/events", payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setFormData({
-          title: "",
-          date: "",
-          venue: "",
-          target_amount: "",
-          audience: "",
-          description: "",
-          image: null,
-        });
+        await apiAxios.post(`/events`, payload);
+        toast.success("Event created successfully!");
       }
 
       setShowForm(false);
-      setEditEvent(null);
       fetchEvents();
     } catch (err) {
-      console.error("Error saving event:", err);
-      toast.error("Failed to save event.");
+      console.error(err);
+      toast.error("Failed to save event");
     }
   };
 
   const handleDelete = async (id) => {
-    toast.info(
-      <div>
-        <p>Are you sure you want to delete this event?</p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <button
-            onClick={async () => {
-              try {
-                await apiAxios.delete(`/events/${id}`);
-                setEvents(events.filter((e) => e.id !== id));
-                toast.dismiss();
-                toast.success("Event deleted successfully!");
-              } catch (err) {
-                console.error("Error deleting event:", err);
-                toast.dismiss();
-                toast.error("Failed to delete event.");
-              }
-            }}
-            style={{
-              background: "red",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              padding: "5px 10px",
-              cursor: "pointer",
-            }}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => toast.dismiss()}
-            style={{
-              background: "#999",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              padding: "5px 10px",
-              cursor: "pointer",
-            }}
-          >
-            No
-          </button>
-        </div>
-      </div>,
-      { autoClose: false, closeOnClick: false }
-    );
+    if (!window.confirm("Delete this event?")) return;
+    try {
+      await apiAxios.delete(`/events/${id}`);
+      toast.success("Event deleted!");
+      fetchEvents();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete event");
+    }
   };
 
-  const handleEdit = (event) => {
-    setEditEvent(event);
-    setFormData({
-      title: event.title,
-      date: event.date,
-      venue: event.venue,
-      target_amount: event.target_amount,
-      audience: event.audience,
-      description: event.description,
-      image: null,
+  // === Filters ===
+  const filtered =
+    (showUpcoming ? upcoming : past).filter((e) => {
+      const matchSearch =
+        e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.venue.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchDate = filterDate ? e.date === filterDate : true;
+      return matchSearch && matchDate;
     });
-    setShowForm(true);
-  };
-
-  const filteredEvents = events.filter((e) => {
-    const matchSearch =
-      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.venue.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchDate = filterDate ? e.date === filterDate : true;
-    return matchSearch && matchDate;
-  });
 
   return (
     <div className="programs-container">
-      <ToastContainer position="top-right" autoClose={2500} theme="colored" />
+      <ToastContainer />
 
-      <div className="programs-header">
-        <h2>Programs & Events</h2>
+      {/* ===== HERO SLIDER ===== */}
+      <section id="events-hero">
+        <div className="events-container">
+          <h2>Upcoming Events</h2>
 
-        <div className="header-actions">
-          {/* Add Event Button */}
-          <button
-            className="add-btn"
-            onClick={() => {
-              setEditEvent(null);
-              setFormData({
-                title: "",
-                date: "",
-                venue: "",
-                target_amount: "",
-                audience: "",
-                description: "",
-                image: null,
-              });
-              setShowForm(true);
-            }}
-          >
-            <FaPlus /> Add Event
-          </button>
+          <div className="event-slider">
+            {upcoming.length > 0 ? (
+              upcoming.map((event, index) => (
+                <div
+                  key={event.id}
+                  className={`event-slide ${
+                    index === activeIndex ? "active" : ""
+                  }`}
+                >
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="event-slide-image"
+                  />
+
+                  <div className="overlay">
+                    <div className="event-info">
+                      <h3>{event.title}</h3>
+                      <p>
+                        {event.date} • {event.venue}
+                      </p>
+                      <p className="desc">
+                        {event.description?.length > 150
+                          ? event.description.slice(0, 150) + "..."
+                          : event.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="no-events">No upcoming events yet.</div>
+            )}
+
+            {upcoming.length > 1 && (
+              <>
+                <button className="nav-btn prev" onClick={prevSlide}>
+                  ‹
+                </button>
+                <button className="nav-btn next" onClick={nextSlide}>
+                  ›
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
 
+      {/* ===== FILTERS ===== */}
       <div className="search-filter">
         <div className="search-box">
           <FaSearch className="icon" />
@@ -217,6 +199,7 @@ const Programs = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+
         <div className="filter-box">
           <FaCalendarAlt className="icon" />
           <input
@@ -227,139 +210,91 @@ const Programs = () => {
         </div>
       </div>
 
-      {loading ? (
-        <p className="loading">Loading events...</p>
-      ) : (
-        <div className="events-grid">
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <div key={event.id} className="event-card">
-                {event.image && (
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="event-image"
-                  />
-                )}
-                <div className="event-content">
-                  <h3>{event.title}</h3>
-                  <p>
-                    <strong>Date:</strong> {event.date}
-                  </p>
-                  <p>
-                    <strong>Venue:</strong> {event.venue}
-                  </p>
-                  <p>
-                    <strong>Target:</strong> Ksh {event.target_amount}
-                  </p>
-                  <p>
-                    <strong>Audience:</strong> {event.audience}
-                  </p>
-                  <p
-                    className={`desc ${
-                      expandedEventId === event.id ? "expanded" : ""
-                    }`}
-                    onClick={() =>
-                      setExpandedEventId(
-                        expandedEventId === event.id ? null : event.id
-                      )
-                    }
-                  >
-                    {event.description}
-                  </p>
-                </div>
-                <div className="event-actions">
-                  <button onClick={() => handleEdit(event)} className="edit-btn">
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(event.id)}
-                    className="delete-btn"
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="no-events">No events found.</p>
-          )}
-        </div>
-      )}
+      {/* === TOGGLE UPCOMING / PAST === */}
+      <div className="toggle-container">
+        <button
+          className={showUpcoming ? "active-toggle" : ""}
+          onClick={() => setShowUpcoming(true)}
+        >
+          Upcoming Events
+        </button>
+        <button
+          className={!showUpcoming ? "active-toggle" : ""}
+          onClick={() => setShowUpcoming(false)}
+        >
+          Past Events
+        </button>
+      </div>
 
+      {/* === EVENTS LIST === */}
+      <div className="events-grid">
+        {filtered.length > 0 ? (
+          filtered.map((event) => (
+            <div key={event.id} className="event-card">
+              <img src={event.image} className="event-image" />
+
+              <div className="event-content">
+                <h3>{event.title}</h3>
+                <p>
+                  <strong>Date:</strong> {event.date}
+                </p>
+                <p>
+                  <strong>Venue:</strong> {event.venue}
+                </p>
+              </div>
+
+              <div className="event-actions">
+                <button onClick={() => handleDelete(event.id)}>
+                  <FaTrash /> Delete
+                </button>
+                <button onClick={() => setEditEvent(event)}>
+                  <FaEdit /> Edit
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="no-events">No events found.</p>
+        )}
+      </div>
+
+      {/* === FORM (Add/Edit) === */}
       {showForm && (
         <div className="event-form">
-          <h3>{editEvent ? "Edit Event" : "Add New Event"}</h3>
+          <h3>{editEvent ? "Edit Event" : "Add Event"}</h3>
           <form onSubmit={handleSave}>
             <input
-              type="text"
               name="title"
-              placeholder="Event Title"
               value={formData.title}
               onChange={handleInputChange}
+              placeholder="Title"
               required
             />
-
             <input
               type="date"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
-              min={new Date().toISOString().split("T")[0]}
               required
             />
-
             <input
-              type="text"
               name="venue"
-              placeholder="Venue"
               value={formData.venue}
               onChange={handleInputChange}
+              placeholder="Venue"
               required
-            />
-            <input
-              type="number"
-              name="target_amount"
-              placeholder="Target Amount"
-              value={formData.target_amount}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              name="audience"
-              placeholder="Target beneficiaries (families)"
-              value={formData.audience}
-              onChange={handleInputChange}
             />
             <textarea
               name="description"
-              placeholder="Description"
               value={formData.description}
               onChange={handleInputChange}
-              rows={4}
+              placeholder="Description"
             ></textarea>
-            <input
-              type="file"
-              name="image"
-              accept="image/*"
-              onChange={handleInputChange}
-            />
 
-            <div className="form-actions">
-              <button type="submit" className="save-btn">
-                {editEvent ? "Update" : "Save"}
-              </button>
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={() => {
-                  setShowForm(false);
-                  setEditEvent(null);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
+            <input type="file" name="image" onChange={handleInputChange} />
+
+            <button type="submit">Save</button>
+            <button onClick={() => setShowForm(false)}>Cancel</button>
           </form>
         </div>
       )}
