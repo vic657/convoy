@@ -150,7 +150,7 @@ const Programs = () => {
                   }`}
                 >
                   <img
-                    src={event.image}
+                    src={event.image_url || event.image}
                     alt={event.title}
                     className="event-slide-image"
                   />
@@ -231,7 +231,7 @@ const Programs = () => {
         {filtered.length > 0 ? (
           filtered.map((event) => (
             <div key={event.id} className="event-card">
-              <img src={event.image} className="event-image" />
+              <img src={event.image_url || event.image} className="event-image" />
 
               <div className="event-content">
                 <h3>{event.title}</h3>
