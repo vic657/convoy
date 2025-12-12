@@ -23,9 +23,20 @@ class Event extends Model
     protected $appends = ['image_url'];
 
     public function getImageUrlAttribute()
-    {
-        return $this->image ? url('storage/' . $this->image) : null;
+{
+    if (!$this->image) {
+        return null;
     }
+
+    // If already a full URL (ImageKit), return as-is
+    if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+        return $this->image;
+    }
+
+    // Otherwise treat as local storage
+    return url('storage/' . $this->image);
+}
+
     public function donations()
 {
     return $this->hasMany(Donation::class, 'event_id');
