@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\BenefitedFamilyController;
 use App\Http\Controllers\AdminDonationController;
+use App\Http\Controllers\EventNotificationController;
 
 // ============================
 // TEST ROUTE
@@ -17,7 +18,7 @@ Route::get('/test', function () {
         'message' => 'API route is working in Laravel 12 🚀'
     ]);
 });
-
+Route::get('/event-notifications', [EventNotificationController::class, 'index']);
 // ============================
 // AUTH ROUTES
 // ============================
