@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { apiAxios } from "../axios";
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../assets/css/programs.css";
@@ -13,18 +12,16 @@ import {
 } from "react-icons/fa";
 
 const Programs = () => {
-  const [events, setEvents] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
-
   const [activeIndex, setActiveIndex] = useState(0);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [showUpcoming, setShowUpcoming] = useState(true);
+
   const [showForm, setShowForm] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const [showUpcoming, setShowUpcoming] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -36,46 +33,53 @@ const Programs = () => {
     image: null,
   });
 
+  /* ================= FETCH EVENTS ================= */
+  const fetchEvents = async () => {
+    try {
+      const res = await apiAxios.get("/events");
+      setUpcoming(res.data.upcoming || []);
+      setPast(res.data.past || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load events");
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
   }, []);
 
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const res = await apiAxios.get("/events");
-
-      setUpcoming(res.data.upcoming || []);
-      setPast(res.data.past || []);
-
-      setEvents([
-        ...(res.data.upcoming || []),
-        ...(res.data.past || []),
-      ]);
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error("Failed to load events");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // === Slider auto change ===
+  /* ================= SLIDER ================= */
   useEffect(() => {
-    if (upcoming.length === 0) return;
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % upcoming.length);
-    }, 4000);
-
+    if (!upcoming.length) return;
+    const timer = setInterval(
+      () => setActiveIndex((i) => (i + 1) % upcoming.length),
+      4000
+    );
     return () => clearInterval(timer);
   }, [upcoming]);
 
   const prevSlide = () =>
-    setActiveIndex((prev) => (prev - 1 + upcoming.length) % upcoming.length);
+    setActiveIndex((i) => (i - 1 + upcoming.length) % upcoming.length);
   const nextSlide = () =>
-    setActiveIndex((prev) => (prev + 1) % upcoming.length);
+    setActiveIndex((i) => (i + 1) % upcoming.length);
 
-  // === Form Handling ===
+  /* ================= EDIT PRE-FILL ================= */
+  useEffect(() => {
+    if (!editEvent) return;
+
+    setFormData({
+      title: editEvent.title || "",
+      date: editEvent.date || "",
+      venue: editEvent.venue || "",
+      target_amount: editEvent.target_amount || "",
+      audience: editEvent.audience || "",
+      description: editEvent.description || "",
+      image: null,
+    });
+  }, [editEvent]);
+
+  /* ================= FORM HANDLING ================= */
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
@@ -85,205 +89,179 @@ const Programs = () => {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const payload = new FormData();
-    for (const key in formData) {
-      payload.append(key, formData[key]);
-    }
+  const payload = new FormData();
 
-    try {
-      if (editEvent) {
-        await apiAxios.post(`/events/${editEvent.id}?_method=PUT`, payload);
-        toast.success("Event updated successfully!");
-      } else {
-        await apiAxios.post(`/events`, payload);
-        toast.success("Event created successfully!");
+  Object.entries(formData).forEach(([key, value]) => {
+    // ✅ Handle image separately
+    if (key === "image") {
+      if (value instanceof File) {
+        payload.append("image", value);
       }
-
-      setShowForm(false);
-      fetchEvents();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save event");
+      return;
     }
-  };
+
+    // ✅ DO NOT send empty strings or nulls
+    if (value !== null && value !== "") {
+      payload.append(key, value);
+    }
+  });
+
+  try {
+    if (editEvent) {
+      await apiAxios.post(
+        `/events/${editEvent.id}?_method=PUT`,
+        payload,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      toast.success("Event updated successfully!");
+    } else {
+      await apiAxios.post("/events", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Event created successfully!");
+    }
+
+    setShowForm(false);
+    setEditEvent(null);
+    fetchEvents();
+  } catch (err) {
+    console.error(err.response?.data || err);
+    toast.error("Failed to save event");
+  }
+};
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this event?")) return;
     try {
       await apiAxios.delete(`/events/${id}`);
-      toast.success("Event deleted!");
+      toast.success("Event deleted");
       fetchEvents();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete event");
+      toast.error("Delete failed");
     }
   };
 
-  // === Filters ===
-  const filtered =
-    (showUpcoming ? upcoming : past).filter((e) => {
-      const matchSearch =
-        e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.venue.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchDate = filterDate ? e.date === filterDate : true;
-      return matchSearch && matchDate;
-    });
+  /* ================= FILTER ================= */
+  const filtered = (showUpcoming ? upcoming : past).filter((e) => {
+    const s = searchTerm.toLowerCase();
+    return (
+      (e.title?.toLowerCase().includes(s) ||
+        e.venue?.toLowerCase().includes(s)) &&
+      (!filterDate || e.date === filterDate)
+    );
+  });
 
+  /* ================= RENDER ================= */
   return (
     <div className="programs-container">
       <ToastContainer />
 
-      {/* ===== HERO SLIDER ===== */}
-<section id="events-hero">
-  <div className="events-container">
-    <h2>Upcoming Events</h2>
+      {/* ===== HERO ===== */}
+      <section id="events-hero">
+        <h2>Upcoming Events</h2>
+        <div className="event-slider">
+          {upcoming.length ? (
+            upcoming.map((event, index) => (
+              <div
+                key={event.id}
+                className={`event-slide ${
+                  index === activeIndex ? "active" : ""
+                }`}
+              >
+                <img
+                  src={event.image_url}
+                  alt={event.title}
+                  className="event-slide-image"
+                />
+                <div className="overlay">
+                  <h3>{event.title}</h3>
+                  <p>{event.date} • {event.venue}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-events">No upcoming events</p>
+          )}
 
-    <div className="event-slider">
-      {upcoming.length > 0 ? (
-        upcoming.map((event, index) => (
-          <div
-            key={event.id}
-            className={`event-slide ${index === activeIndex ? "active" : ""}`}
-          >
-            <img
-              src={event.image_url}
-              alt={event.title}
-              className="event-slide-image"
-            />
+          {upcoming.length > 1 && (
+            <>
+              <button className="nav-btn prev" onClick={prevSlide}>‹</button>
+              <button className="nav-btn next" onClick={nextSlide}>›</button>
+            </>
+          )}
+        </div>
+      </section>
 
-            <div className="overlay">
-              <div className="event-info">
-                <h3>{event.title}</h3>
-                <p>{event.date} • {event.venue}</p>
-                <p className="desc">
-                  {event.description?.length > 150
-                    ? event.description.slice(0, 150) + "..."
-                    : event.description}
-                </p>
+      {/* ===== FILTERS ===== */}
+      <div className="search-filter">
+        <input
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+        />
+        <button onClick={() => setShowForm(true)}>
+          <FaPlus /> Add Event
+        </button>
+      </div>
+
+      {/* ===== LIST ===== */}
+      <div className="events-grid">
+        {filtered.length ? (
+          filtered.map((event) => (
+            <div className="event-card" key={event.id}>
+              <img src={event.image_url} alt="" />
+              <h3>{event.title}</h3>
+              <p>{event.date}</p>
+              <div className="event-actions">
+                <button
+                  onClick={() => {
+                    setEditEvent(event);
+                    setShowForm(true);
+                  }}
+                >
+                  <FaEdit /> Edit
+                </button>
+                <button onClick={() => handleDelete(event.id)}>
+                  <FaTrash /> Delete
+                </button>
               </div>
             </div>
-          </div>
-        ))
-      ) : (
-        <div className="no-events">No upcoming events yet.</div>
-      )}
-
-      {upcoming.length > 1 && (
-        <>
-          <button className="nav-btn prev" onClick={prevSlide}>‹</button>
-          <button className="nav-btn next" onClick={nextSlide}>›</button>
-        </>
-      )}
-    </div>
-  </div>
-</section>
-
-{/* ===== FILTERS ===== */}
-<div className="search-filter">
-  <div className="search-box">
-    <FaSearch className="icon" />
-    <input
-      type="text"
-      placeholder="Search by title or venue..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-  </div>
-
-  <div className="filter-box">
-    <FaCalendarAlt className="icon" />
-    <input
-      type="date"
-      value={filterDate}
-      onChange={(e) => setFilterDate(e.target.value)}
-    />
-  </div>
-</div>
-
-{/* === TOGGLE UPCOMING / PAST === */}
-<div className="toggle-container">
-  <button
-    className={showUpcoming ? "active-toggle" : ""}
-    onClick={() => setShowUpcoming(true)}
-  >
-    Upcoming Events
-  </button>
-  <button
-    className={!showUpcoming ? "active-toggle" : ""}
-    onClick={() => setShowUpcoming(false)}
-  >
-    Past Events
-  </button>
-</div>
-
-{/* === EVENTS LIST === */}
-<div className="events-grid">
-  {filtered.length > 0 ? (
-    filtered.map((event) => (
-      <div key={event.id} className="event-card">
-        <img src={event.image_url} className="event-image" />
-
-        <div className="event-content">
-          <h3>{event.title}</h3>
-          <p><strong>Date:</strong> {event.date}</p>
-          <p><strong>Venue:</strong> {event.venue}</p>
-        </div>
-
-        <div className="event-actions">
-          <button onClick={() => handleDelete(event.id)}>
-            <FaTrash /> Delete
-          </button>
-          <button onClick={() => setEditEvent(event)}>
-            <FaEdit /> Edit
-          </button>
-        </div>
+          ))
+        ) : (
+          <p className="no-events">No events found</p>
+        )}
       </div>
-    ))
-  ) : (
-    <p className="no-events">No events found.</p>
-  )}
-</div>
 
-
-      {/* === FORM (Add/Edit) === */}
+      {/* ===== FORM ===== */}
       {showForm && (
         <div className="event-form">
           <h3>{editEvent ? "Edit Event" : "Add Event"}</h3>
           <form onSubmit={handleSave}>
-            <input
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="Title"
-              required
-            />
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              name="venue"
-              value={formData.venue}
-              onChange={handleInputChange}
-              placeholder="Venue"
-              required
-            />
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Description"
-            ></textarea>
-
+            <input name="title" value={formData.title} onChange={handleInputChange} required />
+            <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
+            <input name="venue" value={formData.venue} onChange={handleInputChange} required />
+            <textarea name="description" value={formData.description} onChange={handleInputChange} />
             <input type="file" name="image" onChange={handleInputChange} />
 
             <button type="submit">Save</button>
-            <button onClick={() => setShowForm(false)}>Cancel</button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(false);
+                setEditEvent(null);
+              }}
+            >
+              Cancel
+            </button>
           </form>
         </div>
       )}

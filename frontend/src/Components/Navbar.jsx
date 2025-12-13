@@ -28,6 +28,11 @@ const Navbar = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+
 
   const [formData, setFormData] = useState({
     name: '', email: '', nationality: '', phone: '',
@@ -62,103 +67,126 @@ const Navbar = () => {
   };
 
   const handleSendOtp = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    try {
-      const res = await fetch(`${API_BASE}/v1/auth/send-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setOtpSent(true);
-        setShowOtpModal(true);
-        alert('OTP sent to your email. It will expire in 5 minutes.');
-      } else {
-        alert(data.error || 'Failed to send OTP.');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Server error.');
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  setIsSendingOtp(true);
+
+  try {
+    const res = await fetch(`${API_BASE}/v1/auth/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: formData.email }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setOtpSent(true);
+      setShowOtpModal(true);
+      alert('OTP sent to your email. It will expire in 5 minutes.');
+    } else {
+      alert(data.error || 'Failed to send OTP.');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert('Server error.');
+  } finally {
+    setIsSendingOtp(false);
+  }
+};
+
 
   const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${API_BASE}/v1/auth/verify-otp-register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          otp,
-          email: formData.email,
-          fullName: formData.name,
-          nationality: formData.nationality,
-          phone: `${countryCode}${formData.phone}`,
-          passportId: formData.passportId,
-          password: formData.password,
-        }),
+  e.preventDefault();
+  setIsVerifyingOtp(true);
+
+  try {
+    const res = await fetch(`${API_BASE}/v1/auth/verify-otp-register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        otp,
+        email: formData.email,
+        fullName: formData.name,
+        nationality: formData.nationality,
+        phone: `${countryCode}${formData.phone}`,
+        passportId: formData.passportId,
+        password: formData.password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert('Registration successful!');
+      setShowOtpModal(false);
+      setShowRegister(false);
+      setOtp('');
+      setFormData({
+        name: '', email: '', nationality: '', phone: '',
+        passportId: '', password: '', confirmPassword: ''
       });
-      const data = await res.json();
-      if (res.ok) {
-        alert('Registration successful!');
-        setShowOtpModal(false);
-        setShowRegister(false);
-        setOtp('');
-        setFormData({
-          name: '', email: '', nationality: '', phone: '',
-          passportId: '', password: '', confirmPassword: ''
-        });
-      } else {
-        alert(data.error || 'Invalid OTP.');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Server error.');
+    } else {
+      alert(data.error || 'Invalid OTP.');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert('Server error.');
+  } finally {
+    setIsVerifyingOtp(false);
+  }
+};
+
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoginError('');
-    if (!recaptchaToken) {
-      setLoginError('Please complete the CAPTCHA.');
-      return;
-    }
-    try {
-      const res = await authAxios.post('/login', {
+  e.preventDefault();
+  setLoginError('');
 
-        email: loginData.email,
-        password: loginData.password,
-        recaptcha_token: recaptchaToken,
-      });
-      const { token, user } = res.data;
+  if (!recaptchaToken) {
+    setLoginError('Please complete the CAPTCHA.');
+    return;
+  }
 
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem('auth_user', JSON.stringify(user)); // Save user info
-      authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  setIsLoggingIn(true); //  START SPINNER
 
+  try {
+    const res = await authAxios.post('/login', {
+      email: loginData.email,
+      password: loginData.password,
+      recaptcha_token: recaptchaToken,
+    });
 
+    const { token, user } = res.data;
+
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('auth_user', JSON.stringify(user));
+    authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    // Small delay for nicer UX
+    setTimeout(() => {
       alert(`Welcome back, ${user.name}`);
       setShowLogin(false);
       setLoginData({ email: '', password: '' });
       setRecaptchaToken('');
+      setIsLoggingIn(false);
 
-      if (user.email === 'staff@gmail.com' && loginData.password === '12345678') {
-            navigate('/storedashboard');
-          } else if (user.role === 'admin') {
-            navigate('/admindashboard');
-          } else {
-            navigate('/userdashboard');
-          }
+      if (user.email === 'staff@gmail.com') {
+        navigate('/storedashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admindashboard');
+      } else {
+        navigate('/userdashboard');
+      }
+    }, 800);
 
+  } catch (err) {
+    console.error(err);
+    setLoginError(err.response?.data?.error || 'Login failed');
+    setIsLoggingIn(false); //  STOP SPINNER
+  }
+};
 
-    } catch (err) {
-      console.error(err);
-      setLoginError(err.response?.data?.error || 'Login failed');
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
@@ -321,7 +349,25 @@ const Navbar = () => {
                 <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
                 <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="eye-icon">{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}</span>
               </div>
-              <button type="submit" className="primary-btn">Send OTP</button>
+              <button
+                type="submit"
+                className="primary-btn"
+                disabled={isSendingOtp}
+                style={{
+                  opacity: isSendingOtp ? 0.7 : 1,
+                  cursor: isSendingOtp ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isSendingOtp ? (
+                  <>
+                    <span className="spinner"></span>
+                    Sending OTP…
+                  </>
+                ) : (
+                  'Send OTP'
+                )}
+              </button>
+
             </form>
             <p className="switch-text">
               Already have an account?{" "}
@@ -342,7 +388,25 @@ const Navbar = () => {
               <input type="email" name="email" placeholder="Email" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} />
               <input type="password" name="password" placeholder="Password" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} />
               <ReCAPTCHA sitekey="6LdSJO4rAAAAANyIPzklLXiG0HP6RF_Giktqt1pb" onChange={(token) => setRecaptchaToken(token)} />
-              <button type="submit" className="primary-btn">Login</button>
+              <button
+                  type="submit"
+                  className="primary-btn"
+                  disabled={isLoggingIn}
+                  style={{
+                    opacity: isLoggingIn ? 0.7 : 1,
+                    cursor: isLoggingIn ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <span className="spinner"></span>
+                      Logging in…
+                    </>
+                  ) : (
+                    'Login'
+                  )}
+                </button>
+
             </form>
             <p className="switch-text">
               Don’t have an account?{" "}
@@ -360,7 +424,24 @@ const Navbar = () => {
             <p>Enter the 6-digit code sent to your email.</p>
             <form onSubmit={handleVerifyOtp}>
               <input type="text" maxLength="6" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />
-              <button type="submit">Verify & Register</button>
+              <button
+                type="submit"
+                disabled={isVerifyingOtp}
+                style={{
+                  opacity: isVerifyingOtp ? 0.7 : 1,
+                  cursor: isVerifyingOtp ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isVerifyingOtp ? (
+                  <>
+                    <span className="spinner"></span>
+                    Creating account…
+                  </>
+                ) : (
+                  'Verify & Register'
+                )}
+              </button>
+
             </form>
             <button onClick={() => setShowOtpModal(false)}>Cancel</button>
           </div>

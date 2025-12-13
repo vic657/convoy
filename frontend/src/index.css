@@ -622,6 +622,23 @@ select {
   color: var(--color-text-dark);
 }
 
+/*login spinner*/
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 

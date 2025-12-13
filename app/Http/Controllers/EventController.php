@@ -22,41 +22,30 @@ class EventController extends Controller
 
     public function index()
     {
-        $upcoming = Event::where('date', '>=', now())
-            ->orderBy('date', 'asc')
-            ->get()
-            ->map(function ($event) {
-                $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
-                $event->total_donations = $totalDonations;
-                $event->progress = $event->target_amount > 0
-                    ? round(($totalDonations / $event->target_amount) * 100, 2)
-                    : 0;
+        $mapEvent = function ($event) {
+            $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
 
-                // Return clean ImageKit URL
-                $event->image_url = $event->image;
+            $event->total_donations = $totalDonations;
+            $event->progress = $event->target_amount > 0
+                ? round(($totalDonations / $event->target_amount) * 100, 2)
+                : 0;
 
-                return $event;
-            });
+            // Always return ImageKit URL
+            $event->image_url = $event->image;
 
-        $past = Event::where('date', '<', now())
-            ->orderBy('date', 'desc')
-            ->get()
-            ->map(function ($event) {
-                $totalDonations = Donation::where('event_id', $event->id)->sum('amount');
-                $event->total_donations = $totalDonations;
-                $event->progress = $event->target_amount > 0
-                    ? round(($totalDonations / $event->target_amount) * 100, 2)
-                    : 0;
-
-                // Return clean ImageKit URL
-                $event->image_url = $event->image;
-
-                return $event;
-            });
+            return $event;
+        };
 
         return response()->json([
-            'upcoming' => $upcoming,
-            'past' => $past,
+            'upcoming' => Event::where('date', '>=', now())
+                ->orderBy('date', 'asc')
+                ->get()
+                ->map($mapEvent),
+
+            'past' => Event::where('date', '<', now())
+                ->orderBy('date', 'desc')
+                ->get()
+                ->map($mapEvent),
         ]);
     }
 
@@ -69,20 +58,11 @@ class EventController extends Controller
             'target_amount' => 'nullable|numeric',
             'audience' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'sometimes|nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-
-            $upload = $this->imageKit->upload([
-                'file' => fopen($file->getRealPath(), 'r'),
-                'fileName' => time() . '_' . $file->getClientOriginalName(),
-                'folder' => '/events'
-            ]);
-
-            // Store ImageKit URL ONLY
-            $validated['image'] = $upload->result->url;
+            $validated['image'] = $this->uploadImage($request->file('image'));
         }
 
         $event = Event::create($validated);
@@ -103,20 +83,13 @@ class EventController extends Controller
             'target_amount' => 'nullable|numeric',
             'audience' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'sometimes|nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-
-            $upload = $this->imageKit->upload([
-                'file' => fopen($file->getRealPath(), 'r'),
-                'fileName' => time() . '_' . $file->getClientOriginalName(),
-                'folder' => '/events'
-            ]);
-
-            // Store ImageKit URL ONLY
-            $validated['image'] = $upload->result->url;
+            $validated['image'] = $this->uploadImage($request->file('image'));
+        } else {
+            unset($validated['image']); // 🔐 protect old image
         }
 
         $event->update($validated);
@@ -131,7 +104,17 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         $event->delete();
-
         return response()->json(['message' => 'Event deleted successfully']);
+    }
+
+    private function uploadImage($file)
+    {
+        $upload = $this->imageKit->upload([
+            'file' => fopen($file->getRealPath(), 'r'),
+            'fileName' => time() . '_' . $file->getClientOriginalName(),
+            'folder' => '/events'
+        ]);
+
+        return $upload->result->url;
     }
 }
